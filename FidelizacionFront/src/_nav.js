@@ -24,66 +24,29 @@ const _nav = [
     icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
   },
   {
-    component: CNavGroup,
+    component: CNavItem,
     name: 'Centros de Ventas',
-    to: '/base',
+    to: '/centroVentas',
     icon: <CIcon icon={cilBuilding} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Agregar',
-        to: '/base/accordion',
-      },
-      {
-        component: CNavItem,
-        name: 'Actualizar',
-        to: '/base/breadcrumbs',
-      },
-      {
-        component: CNavItem,
-        name: 'Eliminar',
-        to: '/base/cards',
-      },
-      {
-        component: CNavItem,
-        name: 'Listar',
-        to: '/base/carousels',
-      },
-    ],
-  },
-  {
-    component: CNavGroup,
-    name: 'Fidelizados',
-    to: '/base',
-    icon: <CIcon icon={cilContact} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Agregar',
-        to: '/base/accordion',
-      },
-      {
-        component: CNavItem,
-        name: 'Actualizar',
-        to: '/base/breadcrumbs',
-      },
-      {
-        component: CNavItem,
-        name: 'Eliminar',
-        to: '/base/cards',
-      },
-      {
-        component: CNavItem,
-        name: 'Listar',
-        to: '/base/carousels',
-      },
-    ],
   },
   {
     component: CNavItem,
+    name: 'Fidelizados',
+    to: '/fidelizados',
+    icon: <CIcon icon={cilContact} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavGroup,
     name: 'Reportes',
-    href: 'https://coreui.io/react/docs/templates/installation/',
+    to: '/base',
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Fidelizados',
+        to: '/reporte/ReporteFidelizados',
+      },
+    ],
   },
 ]
 

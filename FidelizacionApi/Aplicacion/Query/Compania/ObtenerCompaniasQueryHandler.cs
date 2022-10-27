@@ -1,4 +1,5 @@
 ﻿using Datos.Common;
+using Dominio.Common.Enum;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -17,7 +18,7 @@ namespace Aplicacion.Query.Compania
 
         public Task<IEnumerable<Dominio.Entidades.Compania>> Handle(ObtenerCompaniasQuery request, CancellationToken cancellationToken)
         {
-            return _repositorioGenerico.GetAsync();
+            return _repositorioGenerico.GetAsync(c => c.EstadoId == (int)EstadoEnum.Activo);
 
         }
     }

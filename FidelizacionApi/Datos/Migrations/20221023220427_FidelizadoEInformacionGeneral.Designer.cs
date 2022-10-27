@@ -4,6 +4,7 @@ using Datos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Datos.Migrations
 {
     [DbContext(typeof(FidelizacionContext))]
-    partial class FidelizacionContextModelSnapshot : ModelSnapshot
+    [Migration("20221023220427_FidelizadoEInformacionGeneral")]
+    partial class FidelizadoEInformacionGeneral
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -8358,10 +8360,10 @@ namespace Datos.Migrations
                     b.Property<int>("EstadoId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("FechaCreacion")
+                    b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("FechaUltimoReclamo")
+                    b.Property<DateTime>("FechaUltimoReclamo")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Nombre")
@@ -8371,10 +8373,10 @@ namespace Datos.Migrations
                     b.Property<float>("PorcentajePuntos")
                         .HasColumnType("real");
 
-                    b.Property<float?>("Puntos")
+                    b.Property<float>("Puntos")
                         .HasColumnType("real");
 
-                    b.Property<float?>("PuntosReservados")
+                    b.Property<float>("PuntosReservados")
                         .HasColumnType("real");
 
                     b.Property<int>("TipoDocumentoId")
@@ -8419,13 +8421,13 @@ namespace Datos.Migrations
                     b.Property<int?>("Estrato")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("FechaNacimiento")
+                    b.Property<DateTime>("FechaNacimiento")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("FidelizadoId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("NumeroHijos")
+                    b.Property<int>("NumeroHijos")
                         .HasColumnType("int");
 
                     b.Property<int?>("ProfesionId")
