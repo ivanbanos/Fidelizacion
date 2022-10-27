@@ -1,16 +1,11 @@
 import configData from '../../config.json'
 
-const AddCompania = async (nombre, vigenciaPuntos, tipoVencimiento) => {
+const UpdateCentroVenta = async (centroVenta) => {
   try {
-    const body = {
-      nombre: nombre,
-      vigenciaPuntos: vigenciaPuntos,
-      tipoVencimientoId: tipoVencimiento,
-    }
-    const response = await fetch(configData.SERVER_URL + '/api/Companias', {
-      method: 'POST',
+    const response = await fetch(configData.SERVER_URL + '/api/CentroVentas/' + centroVenta.id, {
+      method: 'PUT',
       mode: 'cors',
-      body: JSON.stringify(body),
+      body: JSON.stringify(centroVenta),
       headers: {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
@@ -21,8 +16,8 @@ const AddCompania = async (nombre, vigenciaPuntos, tipoVencimiento) => {
       },
     })
     if (response.status === 200) {
-      let companias = await response.json()
-      return companias
+      let centroVenta = await response.json()
+      return centroVenta
     }
     if (response.status === 403) {
       return 'fail'
@@ -33,4 +28,4 @@ const AddCompania = async (nombre, vigenciaPuntos, tipoVencimiento) => {
   }
 }
 
-export default AddCompania
+export default UpdateCentroVenta

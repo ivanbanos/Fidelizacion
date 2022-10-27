@@ -1,4 +1,5 @@
 ﻿using Datos.Common;
+using Dominio.Common.Enum;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -19,10 +20,11 @@ namespace Aplicacion.Command.Compania
         {
             var compania = await _repositorioGenerico.GetByIdAsync(request.Id);
 
-            if (compania == null) 
+            if (compania == null)
                 return false;
 
-            await _repositorioGenerico.DeleteAsync(compania);
+            compania.EstadoId = (int)EstadoEnum.Inactivo;
+            await _repositorioGenerico.UpdateAsync(compania);
             return true;
         }
     }

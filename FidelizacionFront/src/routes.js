@@ -48,6 +48,9 @@ const Badges = React.lazy(() => import('./views/notifications/badges/Badges'))
 const Modals = React.lazy(() => import('./views/notifications/modals/Modals'))
 const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 const Companias = React.lazy(() => import('./views/companias/Companias'))
+const CentroVentas = React.lazy(() => import('./views/centroVentas/CentroVentas'))
+const Fidelizados = React.lazy(() => import('./views/fidelizados/Fidelizados'))
+const ReporteFidelizados = React.lazy(() => import('./views/reportes/ReporteFidelizados'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
@@ -97,6 +100,9 @@ const routes = [
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
   { path: '/widgets', name: 'Widgets', element: Widgets },
   { path: '/companias', name: 'Companias', element: Companias },
+  { path: '/centroVentas', name: 'CentroVentas', element: CentroVentas },
+  { path: '/fidelizados', name: 'Fidelizados', element: Fidelizados },
+  { path: '/reporte/ReporteFidelizados', name: 'ReporteFidelizados', element: ReporteFidelizados },
 ]
 
 export default routes

@@ -26,28 +26,23 @@ import DeleteCompania from 'src/services/companias/DeleteCompania'
 
 const AddCompaniaModal = (props) => {
   const [addCompaniaVisible, setAddCompaniaVisible] = useState(false)
-  const [newNit, setNewNit] = useState()
   const [newNombre, setNewNombre] = useState()
   const [newVigenciaPuntos, setNewVigenciaPuntosChange] = useState()
   const [newTipoVencimiento, setNewTipoVencimiento] = useState()
   let tipoVencimiento = []
   tipoVencimiento.push({ value: 1, name: 'Tiempo' })
   tipoVencimiento.push({ value: 2, name: 'Conexion' })
-  const handleNitChange = (event) => {
-    setNewNit(event.target.value)
-  }
   const handleNombreChange = (event) => {
     setNewNombre(event.target.value)
   }
   const handleVigenciaPuntosChange = (event) => {
-    console.log(event.target.value)
     setNewVigenciaPuntosChange(event.target.value)
   }
   const handleTipoVencimientoChange = (event) => {
     setNewTipoVencimiento(event.target.value)
   }
   const addCompania = async () => {
-    await AddCompania(newNit, newNombre, newVigenciaPuntos, newTipoVencimiento)
+    await AddCompania(newNombre, newVigenciaPuntos, newTipoVencimiento)
     props.GetCompanias()
     setAddCompaniaVisible(false)
   }
@@ -67,13 +62,7 @@ const AddCompaniaModal = (props) => {
         </CModalHeader>
         <CModalBody>
           <CRow className="mb-2">
-            <CCol xs={3}>Nit:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Nit" onChange={handleNitChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Nombre</CCol>
+            <CCol xs={3}>Nombre:</CCol>
             <CCol xs={9}>
               <CFormInput placeholder="Nombre" onChange={handleNombreChange} />
             </CCol>
@@ -91,9 +80,10 @@ const AddCompaniaModal = (props) => {
                 aria-label="Default select example"
                 onChange={handleTipoVencimientoChange}
               >
-                {tipoVencimiento.map((role) => (
-                  <option key={role.value} value={role.value}>
-                    {role.name}
+                <option>Selecione un opcion</option>
+                {tipoVencimiento.map((tipo) => (
+                  <option key={tipo.value} value={tipo.value}>
+                    {tipo.name}
                   </option>
                 ))}
               </CFormSelect>

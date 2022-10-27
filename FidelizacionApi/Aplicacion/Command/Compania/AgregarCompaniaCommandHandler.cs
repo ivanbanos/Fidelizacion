@@ -1,4 +1,5 @@
 ﻿using Datos.Common;
+using Dominio.Common.Enum;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -17,6 +18,7 @@ namespace Aplicacion.Command.Compania
 
         public async Task<bool> Handle(AgregarCompaniaCommand request, CancellationToken cancellationToken)
         {
+            request.Compania.EstadoId = (int)EstadoEnum.Activo;
             await _repositorioGenerico.AddAsync(request.Compania);
             return true;
         }

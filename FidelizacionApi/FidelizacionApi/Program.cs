@@ -1,4 +1,6 @@
+using Aplicacion.Command.CentroVentas;
 using Aplicacion.Command.Compania;
+using Aplicacion.Query.CentroVentas;
 using Aplicacion.Query.Compania;
 using Datos;
 using Datos.Extension;
@@ -20,6 +22,11 @@ builder.Services.AddMediatR(typeof(ActualizarCompaniaCommand));
 builder.Services.AddMediatR(typeof(EliminarCompaniaCommand));
 builder.Services.AddMediatR(typeof(ObtenerCompaniaQuery));
 builder.Services.AddMediatR(typeof(ObtenerCompaniasQuery));
+builder.Services.AddMediatR(typeof(AgregarCentroVentaCommand));
+builder.Services.AddMediatR(typeof(ActualizarCentroVentaCommand));
+builder.Services.AddMediatR(typeof(EliminarCentroVentaCommand));
+builder.Services.AddMediatR(typeof(ObtenerCentroVentaQuery));
+builder.Services.AddMediatR(typeof(ObtenerCentroVentasQuery));
 builder.Services.AgregarRepositorios();
 
 builder.Services.AddMvc(opt =>
