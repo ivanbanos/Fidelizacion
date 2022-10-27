@@ -23,22 +23,27 @@ import {
   CModalHeader,
   CModalTitle,
 } from '@coreui/react'
+import GetCiudades from 'src/services/configuraciones/GetCiudades'
 
 const ReporteFidelizados = () => {
   const [fidelizados, setFidelizados] = useState([])
+  const [ciudades, setCiudades] = useState([])
 
   const fetchFidelizados = async () => {
     let fidelizados = await GetFidelizados()
     setFidelizados(fidelizados)
   }
 
+  const fetchCiudades = async () => {
+    let ciudades = await GetCiudades()
+    setCiudades(ciudades)
+  }
+
   useEffect(() => {
     fetchFidelizados()
+    fetchCiudades()
   }, [])
 
-  let ciudad = []
-  ciudad.push({ value: 168, name: 'Cartagena' })
-  ciudad.push({ value: 12, name: 'Medellín' })
   return (
     <>
       <h1>Reporte Fidelizados</h1>
@@ -59,9 +64,9 @@ const ReporteFidelizados = () => {
                   <CCol xs={9}>
                     <CFormSelect aria-label="Default select example">
                       <option>Selecione un opci&oacute;n</option>
-                      {ciudad.map((tipo) => (
-                        <option key={tipo.value} value={tipo.value}>
-                          {tipo.name}
+                      {ciudades.map((ciudad) => (
+                        <option key={ciudad.id} value={ciudad.nombre}>
+                          {ciudad.nombre}
                         </option>
                       ))}
                     </CFormSelect>

@@ -23,6 +23,7 @@ import {
 import AddCentroVenta from 'src/services/centroVentas/AddCentroVenta'
 import UpdateCentroVenta from 'src/services/centroVentas/UpdateCentroVenta'
 import DeleteCentroVenta from 'src/services/centroVentas/DeleteCentroVenta'
+import GetCiudades from 'src/services/configuraciones/GetCiudades'
 
 const AddCentroVentaModal = (props) => {
   const [addCentroVentaVisible, setAddCentroVentaVisible] = useState(false)
@@ -32,9 +33,6 @@ const AddCentroVentaModal = (props) => {
   const [newTelefono, setNewTelefonoChange] = useState()
   const [newValorPorPunto, setNewValorPorPuntoChange] = useState()
   const [newCiudad, setNewCiudad] = useState()
-  let ciudad = []
-  ciudad.push({ value: 168, name: 'Cartagena' })
-  ciudad.push({ value: 12, name: 'Medellín' })
   const handleNitChange = (event) => {
     setNewNit(event.target.value)
   }
@@ -108,9 +106,9 @@ const AddCentroVentaModal = (props) => {
             <CCol xs={9}>
               <CFormSelect aria-label="Default select example" onChange={handleCiudadChange}>
                 <option>Selecione un opcion</option>
-                {ciudad.map((ciudad) => (
-                  <option key={ciudad.value} value={ciudad.value}>
-                    {ciudad.name}
+                {props.ciudades.map((ciudad) => (
+                  <option key={ciudad.id} value={ciudad.nombre}>
+                    {ciudad.nombre}
                   </option>
                 ))}
               </CFormSelect>
@@ -139,9 +137,6 @@ const TaskCentroVenta = (props) => {
   const [newTelefono, setNewTelefonoChange] = useState(props.CentroVenta.telefono)
   const [newValorPorPunto, setNewValorPorPuntoChange] = useState(props.CentroVenta.valorPorPunto)
   const [newCiudad, setNewCiudad] = useState(props.CentroVenta.ciudadId)
-  let ciudad = []
-  ciudad.push({ value: 168, name: 'Cartagena' })
-  ciudad.push({ value: 12, name: 'Medellín' })
   const handleNitChange = (event) => {
     setNewNit(event.target.value)
   }
@@ -243,9 +238,9 @@ const TaskCentroVenta = (props) => {
                 aria-label="Default select example"
                 onChange={handleCiudadChange}
               >
-                {ciudad.map((tipo) => (
-                  <option key={tipo.value} value={tipo.value}>
-                    {tipo.name}
+                {props.ciudades.map((ciudad) => (
+                  <option key={ciudad.id} value={ciudad.nombre}>
+                    {ciudad.nombre}
                   </option>
                 ))}
               </CFormSelect>
@@ -293,6 +288,7 @@ const TaskCentroVenta = (props) => {
 const CentroVentas = () => {
   let navigate = useNavigate()
   const [CentroVentas, setCentroVentas] = useState([])
+  const [ciudades, setCiudades] = useState([])
   const toastRef = useRef()
 
   const fetchCentroVentas = async () => {
@@ -300,30 +296,44 @@ const CentroVentas = () => {
     setCentroVentas(CentroVentas)
   }
 
+  const fetchCiudades = async () => {
+    let ciudades = await GetCiudades()
+    setCiudades(ciudades)
+  }
+
   useEffect(() => {
     fetchCentroVentas()
+    fetchCiudades()
   }, [])
 
   return (
     <>
       <h1>Centro de Ventas</h1>
-      <AddCentroVentaModal GetCentroVentas={fetchCentroVentas} />
+      <AddCentroVentaModal GetCentroVentas={fetchCentroVentas} ciudades={ciudades} />
       <CRow>
         <CTable>
           <CTableHead>
             <CTableRow>
+              <CTableHeaderCell scope="col">Nit</CTableHeaderCell>
               <CTableHeaderCell scope="col">Nombre</CTableHeaderCell>
               <CTableHeaderCell scope="col">Valor Por Punto</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Tel&eacute;fono</CTableHeaderCell>
               <CTableHeaderCell scope="col"></CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
             {CentroVentas.map((CentroVenta) => (
               <CTableRow key={CentroVenta.id}>
+                <CTableHeaderCell>{CentroVenta.nit}</CTableHeaderCell>
                 <CTableHeaderCell>{CentroVenta.nombre}</CTableHeaderCell>
                 <CTableHeaderCell>{CentroVenta.valorPorPunto}</CTableHeaderCell>
+                <CTableHeaderCell>{CentroVenta.telefono}</CTableHeaderCell>
                 <CTableHeaderCell>
-                  <TaskCentroVenta GetCentroVentas={fetchCentroVentas} CentroVenta={CentroVenta} />
+                  <TaskCentroVenta
+                    GetCentroVentas={fetchCentroVentas}
+                    ciudades={ciudades}
+                    CentroVenta={CentroVenta}
+                  />
                 </CTableHeaderCell>
               </CTableRow>
             ))}
