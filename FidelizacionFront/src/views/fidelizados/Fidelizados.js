@@ -23,6 +23,7 @@ import {
 import AddFidelizado from 'src/services/fidelizados/AddFidelizado'
 import UpdateFidelizado from 'src/services/fidelizados/UpdateFidelizado'
 import DeleteFidelizado from 'src/services/fidelizados/DeleteFidelizado'
+import GetCiudades from 'src/services/configuraciones/GetCiudades'
 
 const AddFidelizadoModal = (props) => {
   const [addFidelizadoVisible, setAddFidelizadoVisible] = useState(false)
@@ -46,9 +47,6 @@ const AddFidelizadoModal = (props) => {
   sexo.push({ value: 1, name: 'Masculino' })
   sexo.push({ value: 2, name: 'Femenino' })
   sexo.push({ value: 3, name: 'Otro' })
-  let ciudad = []
-  ciudad.push({ value: 168, name: 'Cartagena' })
-  ciudad.push({ value: 12, name: 'Medellín' })
   let profesion = []
   profesion.push({ value: 1, name: 'Ingeniero' })
   profesion.push({ value: 2, name: 'Medico' })
@@ -128,7 +126,7 @@ const AddFidelizadoModal = (props) => {
         </CModalHeader>
         <CModalBody>
           <CRow className="mb-2">
-            <CCol xs={3}>Tipo documento:</CCol>
+            <CCol xs={3}>Tipo documento*:</CCol>
             <CCol xs={9}>
               <CFormSelect aria-label="Default select example" onChange={handleTipoDocumentoChange}>
                 <option>Selecione un opcion</option>
@@ -141,19 +139,19 @@ const AddFidelizadoModal = (props) => {
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Documento:</CCol>
+            <CCol xs={3}>Documento*:</CCol>
             <CCol xs={9}>
               <CFormInput placeholder="Documento" onChange={handleDocumentoChange} />
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Nombre:</CCol>
+            <CCol xs={3}>Nombre*:</CCol>
             <CCol xs={9}>
               <CFormInput placeholder="Nombre" onChange={handleNombreChange} />
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Contrase&ntilde;a:</CCol>
+            <CCol xs={3}>Contrase&ntilde;a*:</CCol>
             <CCol xs={9}>
               <CFormInput
                 type="password"
@@ -163,7 +161,7 @@ const AddFidelizadoModal = (props) => {
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Porcentaje de Puntos:</CCol>
+            <CCol xs={3}>Porcentaje de Puntos*:</CCol>
             <CCol xs={9}>
               <CFormInput
                 placeholder="Porcentaje de Puntos"
@@ -178,13 +176,13 @@ const AddFidelizadoModal = (props) => {
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Celular:</CCol>
+            <CCol xs={3}>Celular*:</CCol>
             <CCol xs={9}>
               <CFormInput placeholder="Celular" onChange={handleCelularChange} />
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Direcci&oacute;n:</CCol>
+            <CCol xs={3}>Direcci&oacute;n*:</CCol>
             <CCol xs={9}>
               <CFormInput placeholder="Direcci&oacute;n" onChange={handleDireccionChange} />
             </CCol>
@@ -202,7 +200,7 @@ const AddFidelizadoModal = (props) => {
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Sexo:</CCol>
+            <CCol xs={3}>Sexo*:</CCol>
             <CCol xs={9}>
               <CFormSelect aria-label="Default select example" onChange={handleSexoChange}>
                 <option>Selecione un opcion</option>
@@ -215,13 +213,13 @@ const AddFidelizadoModal = (props) => {
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Ciudad:</CCol>
+            <CCol xs={3}>Ciudad*:</CCol>
             <CCol xs={9}>
               <CFormSelect aria-label="Default select example" onChange={handleCiudadChange}>
                 <option>Selecione un opcion</option>
-                {ciudad.map((ciudad) => (
-                  <option key={ciudad.value} value={ciudad.value}>
-                    {ciudad.name}
+                {props.ciudades.map((ciudad) => (
+                  <option key={ciudad.id} value={ciudad.nombre}>
+                    {ciudad.nombre}
                   </option>
                 ))}
               </CFormSelect>
@@ -286,9 +284,6 @@ const TaskFidelizado = (props) => {
   sexo.push({ value: 1, name: 'Masculino' })
   sexo.push({ value: 2, name: 'Femenino' })
   sexo.push({ value: 3, name: 'Otro' })
-  let ciudad = []
-  ciudad.push({ value: 168, name: 'Cartagena' })
-  ciudad.push({ value: 12, name: 'Medellín' })
   let profesion = []
   profesion.push({ value: 1, name: 'Ingeniero' })
   profesion.push({ value: 2, name: 'Medico' })
@@ -369,7 +364,7 @@ const TaskFidelizado = (props) => {
         </CModalHeader>
         <CModalBody>
           <CRow className="mb-2">
-            <CCol xs={3}>Tipo documento:</CCol>
+            <CCol xs={3}>Tipo documento*:</CCol>
             <CCol xs={9}>
               <CFormSelect
                 value={newTipoDocumento}
@@ -386,7 +381,7 @@ const TaskFidelizado = (props) => {
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Documento:</CCol>
+            <CCol xs={3}>Documento*:</CCol>
             <CCol xs={9}>
               <CFormInput
                 value={newDocumento}
@@ -396,13 +391,13 @@ const TaskFidelizado = (props) => {
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Nombre:</CCol>
+            <CCol xs={3}>Nombre*:</CCol>
             <CCol xs={9}>
               <CFormInput value={newNombre} placeholder="Nombre" onChange={handleNombreChange} />
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Porcentaje de Puntos:</CCol>
+            <CCol xs={3}>Porcentaje de Puntos*:</CCol>
             <CCol xs={9}>
               <CFormInput
                 value={newPorcentajePunto}
@@ -422,13 +417,13 @@ const TaskFidelizado = (props) => {
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Celular:</CCol>
+            <CCol xs={3}>Celular*:</CCol>
             <CCol xs={9}>
               <CFormInput value={newCelular} placeholder="Celular" onChange={handleCelularChange} />
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Direcci&oacute;n:</CCol>
+            <CCol xs={3}>Direcci&oacute;n*:</CCol>
             <CCol xs={9}>
               <CFormInput
                 value={newDireccion}
@@ -458,7 +453,7 @@ const TaskFidelizado = (props) => {
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Sexo:</CCol>
+            <CCol xs={3}>Sexo*:</CCol>
             <CCol xs={9}>
               <CFormSelect
                 value={newSexo}
@@ -475,7 +470,7 @@ const TaskFidelizado = (props) => {
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Ciudad:</CCol>
+            <CCol xs={3}>Ciudad*:</CCol>
             <CCol xs={9}>
               <CFormSelect
                 value={newCiudad}
@@ -483,9 +478,9 @@ const TaskFidelizado = (props) => {
                 onChange={handleCiudadChange}
               >
                 <option>Selecione un opcion</option>
-                {ciudad.map((tipo) => (
-                  <option key={tipo.value} value={tipo.value}>
-                    {tipo.name}
+                {props.ciudades.map((ciudad) => (
+                  <option key={ciudad.id} value={ciudad.nombre}>
+                    {ciudad.nombre}
                   </option>
                 ))}
               </CFormSelect>
@@ -550,6 +545,7 @@ const TaskFidelizado = (props) => {
 const Fidelizados = () => {
   let navigate = useNavigate()
   const [Fidelizados, setFidelizados] = useState([])
+  const [ciudades, setCiudades] = useState([])
   const toastRef = useRef()
 
   const fetchFidelizados = async () => {
@@ -557,14 +553,20 @@ const Fidelizados = () => {
     setFidelizados(fidelizados)
   }
 
+  const fetchCiudades = async () => {
+    let ciudades = await GetCiudades()
+    setCiudades(ciudades)
+  }
+
   useEffect(() => {
     fetchFidelizados()
+    fetchCiudades()
   }, [])
 
   return (
     <>
       <h1>Fidelizados</h1>
-      <AddFidelizadoModal GetFidelizados={fetchFidelizados} />
+      <AddFidelizadoModal GetFidelizados={fetchFidelizados} ciudades={ciudades} />
       <CRow>
         <CTable>
           <CTableHead>
@@ -580,7 +582,11 @@ const Fidelizados = () => {
                 <CTableHeaderCell>{fidelizado.nombre}</CTableHeaderCell>
                 <CTableHeaderCell>{fidelizado.Puntos}</CTableHeaderCell>
                 <CTableHeaderCell>
-                  <TaskFidelizado GetFidelizados={fetchFidelizados} Fidelizado={fidelizado} />
+                  <TaskFidelizado
+                    GetFidelizados={fetchFidelizados}
+                    ciudades={ciudades}
+                    Fidelizado={fidelizado}
+                  />
                 </CTableHeaderCell>
               </CTableRow>
             ))}
