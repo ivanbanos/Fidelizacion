@@ -218,7 +218,7 @@ const AddFidelizadoModal = (props) => {
               <CFormSelect aria-label="Default select example" onChange={handleCiudadChange}>
                 <option>Selecione un opcion</option>
                 {props.ciudades.map((ciudad) => (
-                  <option key={ciudad.id} value={ciudad.nombre}>
+                  <option key={ciudad.id} value={ciudad.id}>
                     {ciudad.nombre}
                   </option>
                 ))}
@@ -479,7 +479,7 @@ const TaskFidelizado = (props) => {
               >
                 <option>Selecione un opcion</option>
                 {props.ciudades.map((ciudad) => (
-                  <option key={ciudad.id} value={ciudad.nombre}>
+                  <option key={ciudad.id} value={ciudad.id}>
                     {ciudad.nombre}
                   </option>
                 ))}
