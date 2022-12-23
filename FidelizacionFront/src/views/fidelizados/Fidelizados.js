@@ -1,6 +1,7 @@
 import { React, useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import GetFidelizados from '../../services/fidelizados/GetFidelizados'
+import GetFidelizadosPorCentroVenta from '../../services/fidelizados/GetFidelizadosPorCentroVenta'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilPencil, cilX } from '@coreui/icons'
 import {
@@ -24,13 +25,18 @@ import AddFidelizado from 'src/services/fidelizados/AddFidelizado'
 import UpdateFidelizado from 'src/services/fidelizados/UpdateFidelizado'
 import DeleteFidelizado from 'src/services/fidelizados/DeleteFidelizado'
 import GetCiudades from 'src/services/configuraciones/GetCiudades'
+import GetCentroVentas from '../../services/centroVentas/GetCentroVentas'
+import GetCentroVentaPorCompania from '../../services/centroVentas/GetCentroVentaPorCompania'
 
 const AddFidelizadoModal = (props) => {
+  const centroVenta = localStorage.getItem('idCentroVenta')
   const [addFidelizadoVisible, setAddFidelizadoVisible] = useState(false)
+  const [inputCentroVentaVisible, setCentroVentaVisible] = useState(
+    props.Perfil === '1' || props.Perfil === '2',
+  )
   const [newTipoDocumento, setNewTipoDocumento] = useState()
   const [newDocumento, setNewDocumento] = useState()
   const [newNombre, setNewNombre] = useState()
-  const [newContrasena, setNewContrasena] = useState()
   const [newPorcentajePunto, setNewPorcentajePuntoChange] = useState()
   const [newTelefono, setNewTelefonoChange] = useState('0000000000')
   const [newCelular, setNewCelularChange] = useState()
@@ -40,6 +46,7 @@ const AddFidelizadoModal = (props) => {
   const [newSexo, setNewSexoChange] = useState()
   const [newCiudad, setNewCiudad] = useState()
   const [newProfesion, setNewProfesion] = useState(0)
+  const [newCentroVenta, setNewCentroVentaChange] = useState(centroVenta)
   let tipoDocumento = []
   tipoDocumento.push({ value: 1, name: 'Cedula' })
   tipoDocumento.push({ value: 2, name: 'Pasaporte' })
@@ -59,9 +66,6 @@ const AddFidelizadoModal = (props) => {
   }
   const handleNombreChange = (event) => {
     setNewNombre(event.target.value)
-  }
-  const handleContrasenaChange = (event) => {
-    setNewContrasena(event.target.value)
   }
   const handlePorcentajePuntoChange = (event) => {
     setNewPorcentajePuntoChange(event.target.value)
@@ -90,14 +94,16 @@ const AddFidelizadoModal = (props) => {
   const handleProfesionChange = (event) => {
     setNewProfesion(event.target.value)
   }
+  const handleCentroVentaChange = (event) => {
+    setNewCentroVentaChange(event.target.value)
+  }
   const addFidelizado = async () => {
     await AddFidelizado(
       newDocumento,
       newTipoDocumento,
       newNombre,
-      newContrasena,
       newPorcentajePunto,
-      5,
+      newCentroVenta,
       newTelefono,
       newCelular,
       newDireccion,
@@ -148,16 +154,6 @@ const AddFidelizadoModal = (props) => {
             <CCol xs={3}>Nombre*:</CCol>
             <CCol xs={9}>
               <CFormInput placeholder="Nombre" onChange={handleNombreChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Contrase&ntilde;a*:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                type="password"
-                placeholder="Contrase&ntilde;a"
-                onChange={handleContrasenaChange}
-              />
             </CCol>
           </CRow>
           <CRow className="mb-2">
@@ -238,6 +234,21 @@ const AddFidelizadoModal = (props) => {
               </CFormSelect>
             </CCol>
           </CRow>
+          {inputCentroVentaVisible && (
+            <CRow className="mb-2">
+              <CCol xs={3}>Centro de Venta*:</CCol>
+              <CCol xs={9}>
+                <CFormSelect aria-label="Default select example" onChange={handleCentroVentaChange}>
+                  <option>Selecione un opcion</option>
+                  {props.CentroVentas.map((centroVenta) => (
+                    <option key={centroVenta.id} value={centroVenta.id}>
+                      {centroVenta.nombre}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+            </CRow>
+          )}
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setAddFidelizadoVisible(false)}>
@@ -544,13 +555,24 @@ const TaskFidelizado = (props) => {
 
 const Fidelizados = () => {
   let navigate = useNavigate()
+  const perfil = localStorage.getItem('perfil')
   const [Fidelizados, setFidelizados] = useState([])
   const [ciudades, setCiudades] = useState([])
+  const [CentroVentas, setCentroVentas] = useState([])
   const toastRef = useRef()
 
   const fetchFidelizados = async () => {
-    let fidelizados = await GetFidelizados()
-    setFidelizados(fidelizados)
+    let fidelizados = []
+    if (perfil === '1') {
+      fidelizados = await GetFidelizados()
+    } else {
+      fidelizados = await GetFidelizadosPorCentroVenta()
+    }
+    if (fidelizados === 'fail') {
+      navigate('/Login', { replace: true })
+    } else {
+      setFidelizados(fidelizados)
+    }
   }
 
   const fetchCiudades = async () => {
@@ -558,15 +580,35 @@ const Fidelizados = () => {
     setCiudades(ciudades)
   }
 
+  const fetchCentroVentas = async () => {
+    let CentroVentas = []
+    if (perfil === '1') {
+      CentroVentas = await GetCentroVentas()
+    } else {
+      CentroVentas = await GetCentroVentaPorCompania()
+    }
+    if (CentroVentas === 'fail') {
+      navigate('/Login', { replace: true })
+    }
+
+    setCentroVentas(CentroVentas)
+  }
+
   useEffect(() => {
     fetchFidelizados()
     fetchCiudades()
+    fetchCentroVentas()
   }, [])
 
   return (
     <>
       <h1>Fidelizados</h1>
-      <AddFidelizadoModal GetFidelizados={fetchFidelizados} ciudades={ciudades} />
+      <AddFidelizadoModal
+        GetFidelizados={fetchFidelizados}
+        ciudades={ciudades}
+        Perfil={perfil}
+        CentroVentas={CentroVentas}
+      />
       <CRow>
         <CTable>
           <CTableHead>
@@ -580,12 +622,14 @@ const Fidelizados = () => {
             {Fidelizados.map((fidelizado) => (
               <CTableRow key={fidelizado.id}>
                 <CTableHeaderCell>{fidelizado.nombre}</CTableHeaderCell>
-                <CTableHeaderCell>{fidelizado.Puntos}</CTableHeaderCell>
+                <CTableHeaderCell>{fidelizado.puntos ?? 0}</CTableHeaderCell>
                 <CTableHeaderCell>
                   <TaskFidelizado
                     GetFidelizados={fetchFidelizados}
                     ciudades={ciudades}
                     Fidelizado={fidelizado}
+                    Perfil={perfil}
+                    CentroVentas={CentroVentas}
                   />
                 </CTableHeaderCell>
               </CTableRow>

@@ -17,7 +17,7 @@ namespace Aplicacion.Command.Compania
 
         public async Task<bool> Handle(ActualizarCompaniaCommand request, CancellationToken cancellationToken)
         {
-            var compania = await _repositorioGenerico.GetAsync(x => x.Id == request.Id);
+            var compania = await _repositorioGenerico.GetAsync(x => x.Id == request.Compania.Id);
 
             if (compania == null) 
                 return false;

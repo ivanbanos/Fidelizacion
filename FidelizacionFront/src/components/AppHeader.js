@@ -16,6 +16,7 @@ import { cilAccountLogout, cilMenu } from '@coreui/icons'
 
 import { AppBreadcrumb } from './index'
 import { logo } from 'src/assets/brand/logo'
+import { AppHeaderDropdown } from './header/index'
 
 const AppHeader = () => {
   const dispatch = useDispatch()
@@ -40,13 +41,8 @@ const AppHeader = () => {
             </CNavLink>
           </CNavItem>
         </CHeaderNav>
-        <CHeaderNav>
-          <CNavItem>
-            <CNavLink href="#/Login">
-              <CIcon icon={cilAccountLogout} className="mx-1" size="lg" />
-              Logout
-            </CNavLink>
-          </CNavItem>
+        <CHeaderNav className="ms-3">
+          <AppHeaderDropdown />
         </CHeaderNav>
       </CContainer>
       <CHeaderDivider />

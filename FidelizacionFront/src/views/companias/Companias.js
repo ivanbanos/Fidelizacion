@@ -128,10 +128,9 @@ const TaskCompania = (props) => {
 
   const updateCompania = async () => {
     let compania = props.Compania
-    compania.nit = newNit
     compania.nombre = newNombre
     compania.vigenciaPuntos = newVigenciaPuntos
-    compania.idTipoVencimiento = newTipoVencimiento
+    compania.tipoVencimientoId = newTipoVencimiento
     await UpdateCompania(props.Compania)
     props.GetCompanias()
     setUpdateCompaniaVisible(false)
@@ -156,12 +155,6 @@ const TaskCompania = (props) => {
           <CModalTitle>Actualizar Compa&ntilde;ia</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CRow className="mb-2">
-            <CCol xs={3}>Nit:</CCol>
-            <CCol xs={9}>
-              <CFormInput value={newNit} placeholder="Nit" onChange={handleNitChange} />
-            </CCol>
-          </CRow>
           <CRow className="mb-2">
             <CCol xs={3}>Nombre:</CCol>
             <CCol xs={9}>
@@ -235,11 +228,18 @@ const TaskCompania = (props) => {
 
 const Companias = () => {
   let navigate = useNavigate()
+  const perfil = localStorage.getItem('perfil')
   const [Companias, setCompanias] = useState([])
   const toastRef = useRef()
 
   const fetchCompanias = async () => {
     let Companias = await GetCompanias()
+    if (Companias == 'fail') {
+      navigate('/Login', { replace: true })
+    }
+    if (perfil !== '1') {
+      navigate('/dashboard', { replace: true })
+    }
     setCompanias(Companias)
   }
 

@@ -2,6 +2,7 @@
 using Aplicacion.Command.Fidelizados;
 using Aplicacion.Query.Fidelizados;
 using Dominio.Entidades;
+using FidelizacionApi.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -22,19 +23,30 @@ namespace FidelizacionApi.Controllers
         }
 
         [HttpGet]
+        [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<Fidelizado>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<Fidelizado>> GetCentroVenta(CancellationToken cancellationToken)
+        public async Task<IEnumerable<Fidelizado>> GetFidelizados(CancellationToken cancellationToken)
         {
             return await _mediator.Send(new ObtenerFidelizadosQuery(), cancellationToken);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Fidelizado>> GetCentroVentas(int id, CancellationToken cancellationToken)
+        [Authtentication.Authorize]
+        public async Task<ActionResult<Fidelizado>> GetFidelizado(int id, CancellationToken cancellationToken)
         {
             return await _mediator.Send(new ObtenerFidelizadoQuery(id), cancellationToken);
         }
 
+        [HttpGet("CentroVenta/{id}")]
+        [Authtentication.Authorize]
+        [ProducesResponseType(typeof(IEnumerable<Fidelizado>), (int)HttpStatusCode.OK)]
+        public async Task<IEnumerable<Fidelizado>> GetFidelizadosPorCentroVenta(int id, CancellationToken cancellationToken)
+        {
+            return await _mediator.Send(new ObtenerFidelizadosPorCentroVentaQuery(id), cancellationToken);
+        }
+
         [HttpPut("{id}")]
+        [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         public async Task<bool> Put(int id, Fidelizado fidelizado, CancellationToken cancellationToken)
         {
@@ -47,13 +59,15 @@ namespace FidelizacionApi.Controllers
         }
 
         [HttpPost]
+        [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Create(Fidelizado fidelizado, CancellationToken cancellationToken)
+        public async Task<bool> Create(AgregarFidelizadoDto fidelizadoDto, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new AgregarFidelizadoCommand(fidelizado), cancellationToken);
+            return await _mediator.Send(new AgregarFidelizadoCommand(fidelizadoDto.Fidelizado, fidelizadoDto.Usuario), cancellationToken);
         }
 
         [HttpDelete("{id}")]
+        [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         public async Task<bool> Delete(int id, CancellationToken cancellationToken)
         {

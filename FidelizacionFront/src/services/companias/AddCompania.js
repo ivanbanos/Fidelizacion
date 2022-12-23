@@ -7,6 +7,7 @@ const AddCompania = async (nombre, vigenciaPuntos, tipoVencimiento) => {
       vigenciaPuntos: vigenciaPuntos,
       tipoVencimientoId: tipoVencimiento,
     }
+    const token = localStorage.getItem('token')
     const response = await fetch(configData.SERVER_URL + '/api/Companias', {
       method: 'POST',
       mode: 'cors',
@@ -15,6 +16,7 @@ const AddCompania = async (nombre, vigenciaPuntos, tipoVencimiento) => {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
         'sec-fetch-mode': 'cors',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',

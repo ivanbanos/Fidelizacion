@@ -1,6 +1,7 @@
 ﻿using Aplicacion.Command.CentroVentas;
 using Aplicacion.Query.CentroVentas;
 using Dominio.Entidades;
+using FidelizacionApi.Dtos.CentroVentas;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -21,6 +22,7 @@ namespace FidelizacionApi.Controllers
         }
 
         [HttpGet]
+        [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<CentroVenta>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<CentroVenta>> GetCentroVenta(CancellationToken cancellationToken)
         {
@@ -28,31 +30,38 @@ namespace FidelizacionApi.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authtentication.Authorize]
         public async Task<ActionResult<CentroVenta>> GetCentroVentas(int id, CancellationToken cancellationToken)
         {
             return await _mediator.Send(new ObtenerCentroVentaQuery(id), cancellationToken);
         }
 
-        [HttpPut("{id}")]
-        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Put(int id, CentroVenta centroVenta, CancellationToken cancellationToken)
+        [HttpGet("Compania/{id}")]
+        [Authtentication.Authorize]
+        [ProducesResponseType(typeof(IEnumerable<CentroVenta>), (int)HttpStatusCode.OK)]
+        public async Task<IEnumerable<CentroVenta>> GetCentroVentasPorCpmpania(int id, CancellationToken cancellationToken)
         {
-            if (id != centroVenta.Id)
-            {
-                return false;
-            }
+            return await _mediator.Send(new ObtenerCentroVentasPorCompaniaQuery(id), cancellationToken);
+        }
 
-            return await _mediator.Send(new ActualizarCentroVentaCommand(id, centroVenta), cancellationToken);
+        [HttpPut]
+        [Authtentication.Authorize]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        public async Task<bool> Put(CentroVenta centroVenta, CancellationToken cancellationToken)
+        {
+            return await _mediator.Send(new ActualizarCentroVentaCommand(centroVenta), cancellationToken);
         }
 
         [HttpPost]
+        [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Create(CentroVenta centroVenta, CancellationToken cancellationToken)
+        public async Task<bool> Create(AgregarCentroVentaDto centroVenta, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new AgregarCentroVentaCommand(centroVenta), cancellationToken);
+            return await _mediator.Send(new AgregarCentroVentaCommand(new CentroVenta { Nit = centroVenta.Nit, Nombre = centroVenta.Nombre, Direccion = centroVenta.Direccion, Telefono = centroVenta.Telefono, ValorPorPunto = centroVenta.ValorPorPunto, CiudadId = centroVenta.CiudadId, CompaniaId = centroVenta.CompaniaId.Value }), cancellationToken);
         }
 
         [HttpDelete("{id}")]
+        [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         public async Task<bool> Delete(int id, CancellationToken cancellationToken)
         {

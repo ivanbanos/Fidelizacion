@@ -2,6 +2,7 @@ import configData from '../../config.json'
 
 const DeleteFidelizado = async (fidelizado) => {
   try {
+    const token = localStorage.getItem('token')
     const response = await fetch(configData.SERVER_URL + '/api/Fidelizados/' + fidelizado.id, {
       method: 'DELETE',
       mode: 'cors',
@@ -9,6 +10,7 @@ const DeleteFidelizado = async (fidelizado) => {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
         'sec-fetch-mode': 'cors',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',

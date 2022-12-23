@@ -1,6 +1,7 @@
 import { React, useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import GetCentroVentas from '../../services/centroVentas/GetCentroVentas'
+import GetCentroVentaPorCompania from '../../services/centroVentas/GetCentroVentaPorCompania'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilPencil, cilX } from '@coreui/icons'
 import {
@@ -24,15 +25,19 @@ import AddCentroVenta from 'src/services/centroVentas/AddCentroVenta'
 import UpdateCentroVenta from 'src/services/centroVentas/UpdateCentroVenta'
 import DeleteCentroVenta from 'src/services/centroVentas/DeleteCentroVenta'
 import GetCiudades from 'src/services/configuraciones/GetCiudades'
+import GetCompanias from '../../services/companias/GetCompanias'
 
 const AddCentroVentaModal = (props) => {
+  const idCompania = localStorage.getItem('idCompania')
   const [addCentroVentaVisible, setAddCentroVentaVisible] = useState(false)
+  const [inputCompaniaVisible, setCompaniaVisible] = useState(props.Perfil === '1')
   const [newNit, setNewNit] = useState()
   const [newNombre, setNewNombre] = useState()
   const [newDireccion, setNewDireccionChange] = useState()
   const [newTelefono, setNewTelefonoChange] = useState()
   const [newValorPorPunto, setNewValorPorPuntoChange] = useState()
   const [newCiudad, setNewCiudad] = useState()
+  const [newCompania, setNewCompania] = useState(idCompania)
   const handleNitChange = (event) => {
     setNewNit(event.target.value)
   }
@@ -51,8 +56,19 @@ const AddCentroVentaModal = (props) => {
   const handleCiudadChange = (event) => {
     setNewCiudad(event.target.value)
   }
+  const handleCompaniaChange = (event) => {
+    setNewCompania(event.target.value)
+  }
   const addCentroVenta = async () => {
-    await AddCentroVenta(newNit, newNombre, newDireccion, newTelefono, newValorPorPunto, newCiudad)
+    await AddCentroVenta(
+      newNit,
+      newNombre,
+      newDireccion,
+      newTelefono,
+      newValorPorPunto,
+      newCiudad,
+      newCompania === '0' ? null : newCompania,
+    )
     props.GetCentroVentas()
     setAddCentroVentaVisible(false)
   }
@@ -72,37 +88,37 @@ const AddCentroVentaModal = (props) => {
         </CModalHeader>
         <CModalBody>
           <CRow className="mb-2">
-            <CCol xs={3}>Nit:</CCol>
+            <CCol xs={3}>Nit*:</CCol>
             <CCol xs={9}>
               <CFormInput placeholder="Nit" onChange={handleNitChange} />
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Nombre</CCol>
+            <CCol xs={3}>Nombre*:</CCol>
             <CCol xs={9}>
               <CFormInput placeholder="Nombre" onChange={handleNombreChange} />
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Direcci&oacute;n:</CCol>
+            <CCol xs={3}>Direcci&oacute;n*:</CCol>
             <CCol xs={9}>
               <CFormInput placeholder="Direcci&oacute;n" onChange={handleDireccionChange} />
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Tel&eacute;fono:</CCol>
+            <CCol xs={3}>Tel&eacute;fono*:</CCol>
             <CCol xs={9}>
               <CFormInput placeholder="Tel&eacute;fono" onChange={handleTelefonoChange} />
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Valor por punto:</CCol>
+            <CCol xs={3}>Valor por punto*:</CCol>
             <CCol xs={9}>
               <CFormInput placeholder="Varlor por punto" onChange={handleValorPorPuntoChange} />
             </CCol>
           </CRow>
           <CRow className="mb-2">
-            <CCol xs={3}>Ciudad:</CCol>
+            <CCol xs={3}>Ciudad*:</CCol>
             <CCol xs={9}>
               <CFormSelect aria-label="Default select example" onChange={handleCiudadChange}>
                 <option>Selecione un opcion</option>
@@ -114,6 +130,21 @@ const AddCentroVentaModal = (props) => {
               </CFormSelect>
             </CCol>
           </CRow>
+          {inputCompaniaVisible && (
+            <CRow className="mb-2">
+              <CCol xs={3}>Compa&ntilde;ia*:</CCol>
+              <CCol xs={9}>
+                <CFormSelect aria-label="Default select example" onChange={handleCompaniaChange}>
+                  <option>Selecione un opcion</option>
+                  {props.Companias.map((compania) => (
+                    <option key={compania.id} value={compania.id}>
+                      {compania.nombre}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+            </CRow>
+          )}
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setAddCentroVentaVisible(false)}>
@@ -287,12 +318,28 @@ const TaskCentroVenta = (props) => {
 
 const CentroVentas = () => {
   let navigate = useNavigate()
+  const perfil = localStorage.getItem('perfil')
   const [CentroVentas, setCentroVentas] = useState([])
+  const [Companias, setCompania] = useState([])
   const [ciudades, setCiudades] = useState([])
   const toastRef = useRef()
 
   const fetchCentroVentas = async () => {
-    let CentroVentas = await GetCentroVentas()
+    let CentroVentas = []
+    if (perfil === '1') {
+      CentroVentas = await GetCentroVentas()
+    } else {
+      CentroVentas = await GetCentroVentaPorCompania()
+    }
+
+    if (CentroVentas === 'fail') {
+      navigate('/Login', { replace: true })
+    }
+
+    if (perfil !== '1' && perfil !== '2') {
+      navigate('/dashboard', { replace: true })
+    }
+
     setCentroVentas(CentroVentas)
   }
 
@@ -301,15 +348,30 @@ const CentroVentas = () => {
     setCiudades(ciudades)
   }
 
+  const fetchCompanias = async () => {
+    let Companias = await GetCompanias()
+    if (Companias === 'fail') {
+      navigate('/Login', { replace: true })
+    }
+
+    setCompania(Companias)
+  }
+
   useEffect(() => {
     fetchCentroVentas()
     fetchCiudades()
+    fetchCompanias()
   }, [])
 
   return (
     <>
       <h1>Centro de Ventas</h1>
-      <AddCentroVentaModal GetCentroVentas={fetchCentroVentas} ciudades={ciudades} />
+      <AddCentroVentaModal
+        GetCentroVentas={fetchCentroVentas}
+        ciudades={ciudades}
+        Companias={Companias}
+        Perfil={perfil}
+      />
       <CRow>
         <CTable>
           <CTableHead>
@@ -333,6 +395,8 @@ const CentroVentas = () => {
                     GetCentroVentas={fetchCentroVentas}
                     ciudades={ciudades}
                     CentroVenta={CentroVenta}
+                    Companias={Companias}
+                    Perfil={perfil}
                   />
                 </CTableHeaderCell>
               </CTableRow>

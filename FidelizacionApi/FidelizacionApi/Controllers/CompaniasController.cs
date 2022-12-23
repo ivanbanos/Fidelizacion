@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Datos;
-using Dominio.Entidades;
-using System.Net;
-using MediatR;
-using Microsoft.Extensions.Logging;
-using System.Threading;
-using Aplicacion.Command.Compania;
+﻿using Aplicacion.Command.Compania;
 using Aplicacion.Query.Compania;
+using Dominio.Entidades;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace FidelizacionApi.Controllers
 {
@@ -31,6 +22,7 @@ namespace FidelizacionApi.Controllers
 
         // GET: api/Companias
         [HttpGet]
+        [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<Compania>), (int)HttpStatusCode.OK)]
         public async Task<IEnumerable<Compania>> GetCompania(CancellationToken cancellationToken)
         {
@@ -39,24 +31,22 @@ namespace FidelizacionApi.Controllers
 
         // GET: api/Companias/5
         [HttpGet("{id}")]
+        [Authtentication.Authorize]
         public async Task<ActionResult<Compania>> GetCompania(int id, CancellationToken cancellationToken)
         {
             return await _mediator.Send(new ObtenerCompaniaQuery(id), cancellationToken);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
+        [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Put(int id, Compania compania, CancellationToken cancellationToken)
+        public async Task<bool> Put(Compania compania, CancellationToken cancellationToken)
         {
-            if (id != compania.Id)
-            {
-                return false;
-            }
-
-            return await _mediator.Send(new ActualizarCompaniaCommand(id, compania), cancellationToken);
+            return await _mediator.Send(new ActualizarCompaniaCommand(compania), cancellationToken);
         }
 
         [HttpPost]
+        [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         public async Task<bool> Create(Compania compania, CancellationToken cancellationToken)
         {
@@ -64,6 +54,7 @@ namespace FidelizacionApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         public async Task<bool> DeleteCompania(int id, CancellationToken cancellationToken)
         {
