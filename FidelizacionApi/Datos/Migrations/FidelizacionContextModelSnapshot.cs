@@ -24,11 +24,11 @@ namespace Datos.Migrations
 
             modelBuilder.Entity("Dominio.Entidades.CentroVenta", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("CiudadId")
                         .HasColumnType("int");
@@ -8338,11 +8338,11 @@ namespace Datos.Migrations
 
             modelBuilder.Entity("Dominio.Entidades.Fidelizado", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("CentroVentaId")
                         .HasColumnType("int");
@@ -8363,6 +8363,9 @@ namespace Datos.Migrations
 
                     b.Property<DateTime?>("FechaUltimoReclamo")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("Guid")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -8386,18 +8389,16 @@ namespace Datos.Migrations
 
                     b.HasIndex("EstadoId");
 
-                    b.HasIndex("TipoDocumentoId");
-
                     b.ToTable("Fidelizado");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.InformacionAdicional", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Celular")
                         .IsRequired()
@@ -8419,10 +8420,10 @@ namespace Datos.Migrations
                     b.Property<int?>("Estrato")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("FechaNacimiento")
+                    b.Property<DateTime>("FechaNacimiento")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("FidelizadoId")
+                    b.Property<int?>("FidelizadoId")
                         .HasColumnType("int");
 
                     b.Property<int?>("NumeroHijos")
@@ -8449,7 +8450,8 @@ namespace Datos.Migrations
                     b.HasIndex("EstadoCivilId");
 
                     b.HasIndex("FidelizadoId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[FidelizadoId] IS NOT NULL");
 
                     b.HasIndex("ProfesionId");
 
@@ -8487,6 +8489,45 @@ namespace Datos.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Dominio.Entidades.Perfil", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Perfil");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Nombre = "Super Administrador"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Nombre = "Administrador"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Nombre = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Nombre = "Fidelizador"
+                        });
+                });
+
             modelBuilder.Entity("Dominio.Entidades.Profesion", b =>
                 {
                     b.Property<int>("Id")
@@ -8519,6 +8560,36 @@ namespace Datos.Migrations
                             Id = 3,
                             Nombre = "Estudiante"
                         });
+                });
+
+            modelBuilder.Entity("Dominio.Entidades.Punto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("CentroVentaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Factura")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FidelizadoId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("ValorVenta")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CentroVentaId");
+
+                    b.HasIndex("FidelizadoId");
+
+                    b.ToTable("Punto");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.Sexo", b =>
@@ -8618,6 +8689,56 @@ namespace Datos.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Dominio.Entidades.Usuario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("CentroVentaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Contrasena")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EstadoId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("Guid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("NombreUsuario")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PerfilId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CentroVentaId");
+
+                    b.HasIndex("EstadoId");
+
+                    b.HasIndex("PerfilId");
+
+                    b.ToTable("Usuario");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Contrasena = "$2a$11$VLwdQFPB4zzuVjRkDwm8a.AhZ8Yw6w.00YWRxwxGx5kuYQeLmRv6e",
+                            EstadoId = 1,
+                            Guid = new Guid("cc6ed5af-91fa-431c-90f7-05e0ca4078ac"),
+                            NombreUsuario = "Arthur",
+                            PerfilId = 1
+                        });
+                });
+
             modelBuilder.Entity("Dominio.Entidades.CentroVenta", b =>
                 {
                     b.HasOne("Dominio.Entidades.Ciudad", "Ciudad")
@@ -8633,7 +8754,7 @@ namespace Datos.Migrations
                         .IsRequired();
 
                     b.HasOne("Dominio.Entidades.Estado", "Estado")
-                        .WithMany("CentroVentas")
+                        .WithMany()
                         .HasForeignKey("EstadoId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -8659,13 +8780,13 @@ namespace Datos.Migrations
             modelBuilder.Entity("Dominio.Entidades.Compania", b =>
                 {
                     b.HasOne("Dominio.Entidades.Estado", "Estado")
-                        .WithMany("Companias")
+                        .WithMany()
                         .HasForeignKey("EstadoId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dominio.Entidades.TipoVencimiento", "TipoVencimiento")
-                        .WithMany("Companias")
+                        .WithMany()
                         .HasForeignKey("TipoVencimientoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -8695,14 +8816,8 @@ namespace Datos.Migrations
                         .IsRequired();
 
                     b.HasOne("Dominio.Entidades.Estado", "Estado")
-                        .WithMany("Fidelizados")
+                        .WithMany()
                         .HasForeignKey("EstadoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dominio.Entidades.TipoDocumento", null)
-                        .WithMany("Fidelizados")
-                        .HasForeignKey("TipoDocumentoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -8727,18 +8842,16 @@ namespace Datos.Migrations
                         .WithMany("InformacionesAdicionales")
                         .HasForeignKey("EstadoCivilId");
 
-                    b.HasOne("Dominio.Entidades.Fidelizado", "Fidelizado")
+                    b.HasOne("Dominio.Entidades.Fidelizado", null)
                         .WithOne("InformacionAdicional")
-                        .HasForeignKey("Dominio.Entidades.InformacionAdicional", "FidelizadoId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .HasForeignKey("Dominio.Entidades.InformacionAdicional", "FidelizadoId");
 
                     b.HasOne("Dominio.Entidades.Profesion", "Profesion")
-                        .WithMany("InformacionesAdicionales")
+                        .WithMany()
                         .HasForeignKey("ProfesionId");
 
                     b.HasOne("Dominio.Entidades.Sexo", "Sexo")
-                        .WithMany("InformacionesAdicionales")
+                        .WithMany()
                         .HasForeignKey("SexoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -8747,11 +8860,59 @@ namespace Datos.Migrations
 
                     b.Navigation("EmpresaFidelizado");
 
-                    b.Navigation("Fidelizado");
-
                     b.Navigation("Profesion");
 
                     b.Navigation("Sexo");
+                });
+
+            modelBuilder.Entity("Dominio.Entidades.Punto", b =>
+                {
+                    b.HasOne("Dominio.Entidades.CentroVenta", "CentroVenta")
+                        .WithMany()
+                        .HasForeignKey("CentroVentaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dominio.Entidades.Fidelizado", "Fidelizado")
+                        .WithMany("Punto")
+                        .HasForeignKey("FidelizadoId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("CentroVenta");
+
+                    b.Navigation("Fidelizado");
+                });
+
+            modelBuilder.Entity("Dominio.Entidades.Usuario", b =>
+                {
+                    b.HasOne("Dominio.Entidades.CentroVenta", "CentroVenta")
+                        .WithMany("Usuarios")
+                        .HasForeignKey("CentroVentaId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Dominio.Entidades.Estado", "Estado")
+                        .WithMany()
+                        .HasForeignKey("EstadoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dominio.Entidades.Perfil", "Perfil")
+                        .WithMany("Usuarios")
+                        .HasForeignKey("PerfilId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("CentroVenta");
+
+                    b.Navigation("Estado");
+
+                    b.Navigation("Perfil");
+                });
+
+            modelBuilder.Entity("Dominio.Entidades.CentroVenta", b =>
+                {
+                    b.Navigation("Usuarios");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.Ciudad", b =>
@@ -8774,15 +8935,6 @@ namespace Datos.Migrations
                     b.Navigation("InformacionesAdicionales");
                 });
 
-            modelBuilder.Entity("Dominio.Entidades.Estado", b =>
-                {
-                    b.Navigation("CentroVentas");
-
-                    b.Navigation("Companias");
-
-                    b.Navigation("Fidelizados");
-                });
-
             modelBuilder.Entity("Dominio.Entidades.EstadoCivil", b =>
                 {
                     b.Navigation("InformacionesAdicionales");
@@ -8790,7 +8942,10 @@ namespace Datos.Migrations
 
             modelBuilder.Entity("Dominio.Entidades.Fidelizado", b =>
                 {
-                    b.Navigation("InformacionAdicional");
+                    b.Navigation("InformacionAdicional")
+                        .IsRequired();
+
+                    b.Navigation("Punto");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.Pais", b =>
@@ -8798,24 +8953,9 @@ namespace Datos.Migrations
                     b.Navigation("Departamentos");
                 });
 
-            modelBuilder.Entity("Dominio.Entidades.Profesion", b =>
+            modelBuilder.Entity("Dominio.Entidades.Perfil", b =>
                 {
-                    b.Navigation("InformacionesAdicionales");
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.Sexo", b =>
-                {
-                    b.Navigation("InformacionesAdicionales");
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.TipoDocumento", b =>
-                {
-                    b.Navigation("Fidelizados");
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.TipoVencimiento", b =>
-                {
-                    b.Navigation("Companias");
+                    b.Navigation("Usuarios");
                 });
 #pragma warning restore 612, 618
         }

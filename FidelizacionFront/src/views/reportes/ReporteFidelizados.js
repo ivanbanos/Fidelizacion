@@ -93,7 +93,7 @@ const ReporteFidelizados = () => {
             {fidelizados.map((fidelizado) => (
               <CTableRow key={fidelizado.id}>
                 <CTableHeaderCell>{fidelizado.nombre}</CTableHeaderCell>
-                <CTableHeaderCell>0</CTableHeaderCell>
+                <CTableHeaderCell>{fidelizado.puntos ?? 0}</CTableHeaderCell>
                 <CTableHeaderCell>{fidelizado.porcentajePuntos}</CTableHeaderCell>
                 <CTableHeaderCell>0</CTableHeaderCell>
                 <CTableHeaderCell>{fidelizado.informacionAdicional.celular}</CTableHeaderCell>

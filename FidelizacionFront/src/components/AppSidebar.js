@@ -1,4 +1,4 @@
-import React from 'react'
+import { React, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { CSidebar, CSidebarBrand, CSidebarNav, CSidebarToggler } from '@coreui/react'
@@ -14,11 +14,32 @@ import 'simplebar/dist/simplebar.min.css'
 
 // sidebar nav config
 import navigation from '../_nav'
+import navigationSuperAdministrador from '../_navSuperAdministrador'
+import navigationAdministrador from '../_navAdministrador'
+import navigationSupervisor from '../_navSupervisor'
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
+  const [Navigation, setNavigation] = useState([])
+
+  const returnNav = () => {
+    const perfil = localStorage.getItem('perfil')
+    if (perfil === '1') {
+      setNavigation(navigationSuperAdministrador)
+    } else if (perfil === '2') {
+      setNavigation(navigationAdministrador)
+    } else if (perfil === '3') {
+      setNavigation(navigationSupervisor)
+    } else {
+      setNavigation(navigation)
+    }
+  }
+
+  useEffect(() => {
+    returnNav()
+  }, [])
 
   return (
     <CSidebar
@@ -39,7 +60,7 @@ const AppSidebar = () => {
       </CSidebarBrand>
       <CSidebarNav>
         <SimpleBar>
-          <AppSidebarNav className="sideNav" items={navigation} />
+          <AppSidebarNav className="sideNav" items={Navigation} />
         </SimpleBar>
       </CSidebarNav>
       <CSidebarToggler
@@ -50,4 +71,4 @@ const AppSidebar = () => {
   )
 }
 
-export default React.memo(AppSidebar)
+export default AppSidebar

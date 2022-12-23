@@ -1,5 +1,5 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { React, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   CButton,
   CCard,
@@ -15,8 +15,46 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
+import GetToken from '../../../services/Autenticacion/GetToken'
 
 const Login = () => {
+  let navigate = useNavigate()
+  localStorage.setItem('token', null)
+  localStorage.setItem('perfil', null)
+  localStorage.setItem('idUsuario', null)
+  localStorage.setItem('idCentroVenta', null)
+  localStorage.setItem('idCompania', null)
+  const [errorMessages, seterrormessages] = useState({})
+  const [first_name, setfirst_name] = useState()
+  const [password, setPassword] = useState()
+  const handleFirstNameChange = (event) => {
+    setfirst_name(event.target.value)
+  }
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value)
+  }
+  const handleSubmit = async (event) => {
+    //Prevent page reload
+    event.preventDefault()
+    const token = await GetToken(first_name, password)
+    // Compare user info
+    if (token) {
+      localStorage.setItem('token', token.token)
+      localStorage.setItem('perfil', token.perfil)
+      localStorage.setItem('idUsuario', token.idUsuario)
+      localStorage.setItem('idCentroVenta', token.idCentroVenta)
+      localStorage.setItem('idCompania', token.idCompania)
+      if (token.perfil < 3) {
+        navigate('/Dashboard', { replace: true })
+      } else {
+        navigate('/companias', { replace: true })
+      }
+    } else {
+      // Username not found
+      seterrormessages({ name: 'password', message: 'Username or Password incorrect' })
+    }
+  }
+
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
@@ -32,28 +70,39 @@ const Login = () => {
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput placeholder="Username" autoComplete="username" />
+                      <CFormInput
+                        placeholder="Username"
+                        name="first_name"
+                        value={first_name}
+                        autoComplete="username"
+                        onChange={handleFirstNameChange}
+                      />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
                         <CIcon icon={cilLockLocked} />
                       </CInputGroupText>
                       <CFormInput
+                        name="password"
                         type="password"
+                        value={password}
                         placeholder="Password"
                         autoComplete="current-password"
+                        onChange={handlePasswordChange}
                       />
                     </CInputGroup>
                     <CRow>
                       <CCol xs={6}>
-                        <CButton color="primary" className="px-4">
+                        <CButton
+                          color="primary"
+                          className="px-4"
+                          onClick={handleSubmit}
+                          navigate={navigate}
+                          seterrormessages={seterrormessages}
+                        >
                           Login
                         </CButton>
-                      </CCol>
-                      <CCol xs={6} className="text-right">
-                        <CButton color="link" className="px-0">
-                          Forgot password?
-                        </CButton>
+                        <div className="error">{errorMessages.message}</div>
                       </CCol>
                     </CRow>
                   </CForm>
@@ -62,16 +111,11 @@ const Login = () => {
               <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
                 <CCardBody className="text-center">
                   <div>
-                    <h2>Sign up</h2>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                      tempor incididunt ut labore et dolore magna aliqua.
-                    </p>
-                    <Link to="/register">
-                      <CButton color="primary" className="mt-3" active tabIndex={-1}>
-                        Register Now!
-                      </CButton>
-                    </Link>
+                    <img
+                      id="logo"
+                      width={'100%'}
+                      src={require('../../../assets/images/sigesLogo.jpeg')}
+                    />
                   </div>
                 </CCardBody>
               </CCard>

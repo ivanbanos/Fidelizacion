@@ -19,18 +19,6 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Compañias',
-    to: '/companias',
-    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Centros de Ventas',
-    to: '/centroVentas',
-    icon: <CIcon icon={cilBuilding} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
     name: 'Fidelizados',
     to: '/fidelizados',
     icon: <CIcon icon={cilContact} customClassName="nav-icon" />,

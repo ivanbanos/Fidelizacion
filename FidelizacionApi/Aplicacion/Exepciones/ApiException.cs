@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using System.Runtime.Serialization;
 
-namespace MachineUtilizationApi
+namespace Aplicacion.Exepciones
 {
     [Serializable]
-    internal class ApiException : Exception
+    public class ApiException : Exception
     {
         public ApiException()
         {

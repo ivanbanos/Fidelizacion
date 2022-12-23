@@ -2,12 +2,14 @@ import configData from '../../config.json'
 
 const GetCiudades = async () => {
   try {
+    const token = localStorage.getItem('token')
     const response = await fetch(configData.SERVER_URL + '/api/Configuracion/Ciudades', {
       method: 'GET',
       mode: 'cors',
       headers: {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
+        Authorization: 'Bearer ' + token,
         'sec-fetch-mode': 'cors',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',

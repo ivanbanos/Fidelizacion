@@ -21,17 +21,38 @@ namespace Datos
         public DbSet<EmpresaFidelizado> EmpresaFidelizado { get; set; }
         public DbSet<Fidelizado> Fidelizado { get; set; }
         public DbSet<InformacionAdicional> InformacionAdicional { get; set; }
+        public DbSet<Usuario> Usuario { get; set; }
+        public DbSet<Punto> Punto { get; set; }
+        public DbSet<Perfil> Perfil { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Compania>()
                     .HasOne(c => c.Estado)
-                    .WithMany(e => e.Companias)
+                    .WithMany()
                     .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<CentroVenta>()
                     .HasOne(cv => cv.Estado)
-                    .WithMany(e => e.CentroVentas)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Usuario>()
+                    .HasOne(u => u.CentroVenta)
+                    .WithMany(cv => cv.Usuarios)
+                    .HasForeignKey(u => u.CentroVentaId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Punto>()
+                    .HasOne(p => p.Fidelizado)
+                    .WithMany(f => f.Punto)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+
+            modelBuilder.Entity<Usuario>()
+                    .HasOne(u => u.Perfil)
+                    .WithMany(p => p.Usuarios)
+                    .HasForeignKey(u => u.PerfilId)
                     .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<TipoVencimiento>().HasData(new TipoVencimiento[]
@@ -1241,6 +1262,28 @@ namespace Datos
                 new TipoDocumento {Id = 1, Nombre="Cedula"},
                 new TipoDocumento {Id = 2, Nombre="Cedula Extranjeria"},
                 new TipoDocumento {Id = 3, Nombre="Pasaporte"}
+            });
+
+            modelBuilder.Entity<Perfil>().HasData(new Perfil[]
+            {
+                new Perfil {Id = 1, Nombre="Super Administrador"},
+                new Perfil {Id = 2, Nombre="Administrador"},
+                new Perfil {Id = 3, Nombre="Supervisor"},
+                new Perfil {Id = 4, Nombre="Fidelizador"}
+            });
+
+            modelBuilder.Entity<Usuario>().HasData(new Usuario[]
+            {
+                new Usuario 
+                {
+                    Id = 1, 
+                    Guid = Guid.NewGuid(),
+                    NombreUsuario="Arthur", 
+                    Contrasena="$2a$11$VLwdQFPB4zzuVjRkDwm8a.AhZ8Yw6w.00YWRxwxGx5kuYQeLmRv6e", 
+                    PerfilId = 1, 
+                    EstadoId = 1, 
+                    CentroVentaId = null
+                }
             });
         }
 

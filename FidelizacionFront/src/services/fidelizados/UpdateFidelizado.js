@@ -2,6 +2,7 @@ import configData from '../../config.json'
 
 const UpdateFidelizado = async (fidelizado) => {
   try {
+    const token = localStorage.getItem('token')
     const response = await fetch(configData.SERVER_URL + '/api/Fidelizados/' + fidelizado.id, {
       method: 'PUT',
       mode: 'cors',
@@ -10,6 +11,7 @@ const UpdateFidelizado = async (fidelizado) => {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
         'sec-fetch-mode': 'cors',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',

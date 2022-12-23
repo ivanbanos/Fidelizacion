@@ -1,4 +1,4 @@
-import React from 'react'
+import { React, useState, useEffect, useRef } from 'react'
 
 import Companias from '../companias/Companias'
 import {
@@ -44,11 +44,44 @@ import {
   cilUser,
   cilUserFemale,
 } from '@coreui/icons'
+import CentroVentas from '../centroVentas/CentroVentas'
+import Fidelizados from '../fidelizados/Fidelizados'
 
 const Dashboard = () => {
+  const perfil = localStorage.getItem('perfil')
+  const [companiaVisible, setCompaniaVisible] = useState(false)
+  const [centroVentasVisible, setCentroVentasVisible] = useState(false)
+  const [fidelizadosVisible, setFidelizadosVisible] = useState(false)
+
+  const returnPatanllaPrincipal = () => {
+    if (perfil === '1') {
+      setCompaniaVisible(true)
+      setCentroVentasVisible(false)
+      setFidelizadosVisible(false)
+    } else if (perfil === '2') {
+      setCompaniaVisible(false)
+      setCentroVentasVisible(true)
+      setFidelizadosVisible(false)
+    } else if (perfil === '3') {
+      setCompaniaVisible(false)
+      setCentroVentasVisible(false)
+      setFidelizadosVisible(true)
+    } else {
+      setCompaniaVisible(false)
+      setCentroVentasVisible(false)
+      setFidelizadosVisible(true)
+    }
+  }
+
+  useEffect(() => {
+    returnPatanllaPrincipal()
+  }, [])
+
   return (
     <>
-      <Companias></Companias>
+      {companiaVisible && <Companias></Companias>}
+      {centroVentasVisible && <CentroVentas></CentroVentas>}
+      {fidelizadosVisible && <Fidelizados></Fidelizados>}
     </>
   )
 }

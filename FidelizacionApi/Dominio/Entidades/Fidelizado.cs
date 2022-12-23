@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Dominio.Entidades
+﻿namespace Dominio.Entidades
 {
     public class Fidelizado
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
+        public Guid? Guid { get; set; }
         public string Documento { get; set; }
         public int TipoDocumentoId { get; set; }
         public string Nombre { get; set; }
@@ -19,9 +14,10 @@ namespace Dominio.Entidades
         public DateTime? FechaCreacion { get; set; }
         public DateTime? FechaUltimoReclamo { get; set; }
         public int CentroVentaId { get; set; }
-        public CentroVenta? CentroVenta { get; set; }
+        public virtual CentroVenta? CentroVenta { get; set; }
         public int EstadoId { get; set; }
-        public Estado? Estado { get; set; }
-        public InformacionAdicional? InformacionAdicional { get; set; }
+        public virtual Estado? Estado { get; set; }
+        public virtual InformacionAdicional InformacionAdicional { get; set; }
+        public virtual IEnumerable<Punto>? Punto { get; set; }
     }
 }

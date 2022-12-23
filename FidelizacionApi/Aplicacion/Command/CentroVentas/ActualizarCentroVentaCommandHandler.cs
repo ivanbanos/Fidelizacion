@@ -18,7 +18,7 @@ namespace Aplicacion.Command.CentroVentas
 
         public async Task<bool> Handle(ActualizarCentroVentaCommand request, CancellationToken cancellationToken)
         {
-            var centroVenta = await _repositorioGenerico.GetAsync(x => x.Id == request.Id);
+            var centroVenta = await _repositorioGenerico.GetAsync(x => x.Id == request.CentroVenta.Id);
 
             if (centroVenta == null)
                 return false;

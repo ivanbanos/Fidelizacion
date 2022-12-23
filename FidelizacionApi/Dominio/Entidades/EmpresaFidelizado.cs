@@ -7,6 +7,6 @@
         public string Direccion { get; set; }
         public string Tefelono { get; set; }
         public float PorcentajePuntos { get; set; }
-        public IEnumerable<InformacionAdicional> InformacionesAdicionales { get; set; }
+        public virtual IEnumerable<InformacionAdicional> InformacionesAdicionales { get; set; }
     }
 }

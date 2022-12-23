@@ -2,6 +2,7 @@ import configData from '../../config.json'
 
 const GetCentroVentas = async () => {
   try {
+    const token = localStorage.getItem('token')
     const response = await fetch(configData.SERVER_URL + '/api/CentroVentas', {
       method: 'GET',
       mode: 'cors',
@@ -9,6 +10,7 @@ const GetCentroVentas = async () => {
         'Access-Control-Allow-Origin': '*',
         accept: 'text/plain',
         'sec-fetch-mode': 'cors',
+        Authorization: 'Bearer ' + token,
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
       },
