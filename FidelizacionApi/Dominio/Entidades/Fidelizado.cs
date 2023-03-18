@@ -7,7 +7,7 @@
         public string Documento { get; set; }
         public int TipoDocumentoId { get; set; }
         public string Nombre { get; set; }
-        public string Contrasena { get; set; }
+        public string? Contrasena { get; set; }
         public float? Puntos { get; set; }
         public float PorcentajePuntos { get; set; }
         public float? PuntosReservados { get; set; }
