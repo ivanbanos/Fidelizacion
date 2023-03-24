@@ -1,7 +1,7 @@
 import { React, useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-import GetFidelizados from '../../services/fidelizados/GetFidelizados'
+import GetFidelizadosPorCentroVenta from '../../services/fidelizados/GetFidelizadosPorCentroVenta'
 import {
   CButton,
   CRow,
@@ -30,7 +30,7 @@ const ReporteFidelizados = () => {
   const [ciudades, setCiudades] = useState([])
 
   const fetchFidelizados = async () => {
-    let fidelizados = await GetFidelizados()
+    let fidelizados = await GetFidelizadosPorCentroVenta()
     setFidelizados(fidelizados)
   }
 
