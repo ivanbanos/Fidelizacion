@@ -1,9 +1,11 @@
-﻿using Aplicacion.Extension;
+﻿using Aplicacion.Exepciones;
+using Aplicacion.Extension;
 using Datos.Common;
 using Dominio.Common.Enum;
 using Dominio.Entidades;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace Aplicacion.Command.Usuarios
 {
@@ -20,13 +22,16 @@ namespace Aplicacion.Command.Usuarios
 
         public async Task<bool> Handle(CrearUsuarioCommand request, CancellationToken cancellationToken)
         {
-            {
-                request.Usuario.EstadoId = (int)EstadoEnum.Activo;
-                request.Usuario.Contrasena = request.Usuario.NombreUsuario.Hash();
+            var usuario = await _repositorioGenerico.GetAsync(u => u.NombreUsuario.Equals(request.Usuario.NombreUsuario) 
+                                                                    && u.CentroVentaId == request.Usuario.CentroVentaId);
+            if(usuario.Any())
+                throw new ApiException() { ExceptionMessage = "Nombre de usuario ya existe", StatusCode = HttpStatusCode.BadRequest };
 
-                await _repositorioGenerico.AddAsync(request.Usuario);
-                return true;
-            }
+            request.Usuario.EstadoId = (int)EstadoEnum.Activo;
+            request.Usuario.Contrasena = request.Usuario.NombreUsuario.Hash();
+
+            await _repositorioGenerico.AddAsync(request.Usuario);
+            return true;
         }
     }
 }

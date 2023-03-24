@@ -24,11 +24,19 @@ namespace Aplicacion.Command.Fidelizados
 
         public async Task<bool> Handle(AgregarFidelizadoCommand request, CancellationToken cancellationToken)
         {
-            var usuarios = await _repositorioGenericoUsuario.GetAsync(u => u.Guid.Equals(request.Usuario));
+            var usuarios = await _repositorioGenericoUsuario.GetAsync(u => u.Guid.Equals(request.Usuario) 
+                                                                            && u.CentroVentaId == request.Fidelizado.CentroVentaId);
             var usuario = usuarios.FirstOrDefault();
             if (usuario == null)
             {
                 throw new ApiException() { ExceptionMessage = "Usuario no existe", StatusCode = HttpStatusCode.BadRequest };
+            }
+            var fidelizado = await _repositorioGenerico
+                                        .GetAsync(f => f.Documento.Equals(request.Fidelizado.Documento) 
+                                                        && f.CentroVentaId == request.Fidelizado.CentroVentaId);
+            if(fidelizado.Any())
+            {
+                throw new ApiException() { ExceptionMessage = "Fidelizado ya existe", StatusCode = HttpStatusCode.BadRequest };
             }
             request.Fidelizado.EstadoId = (int)EstadoEnum.Activo;
             request.Fidelizado.FechaCreacion = DateTime.Now;
