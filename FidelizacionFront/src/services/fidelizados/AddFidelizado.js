@@ -4,7 +4,6 @@ const AddFidelizado = async (
   documento,
   tipoDocumentoId,
   nombre,
-  contrasena,
   porcentajePuntos,
   centroVentaId,
   telefono,
