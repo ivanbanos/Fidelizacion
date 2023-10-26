@@ -34,7 +34,7 @@ namespace Aplicacion.Command.Puntos
             if(!fidelizados.Any())
                 return false;
 
-            var fidelizado = fidelizados.FirstOrDefault();
+            var fidelizado = fidelizados.FirstOrDefault(x=>x.CentroVentaId == centroVenta.Id);
 
             var facturas = await _repositorioGenerico.GetAsync(fc => fc.Factura == request.Factura && fc.CentroVentaId == centroVenta.Id);
             if(facturas.Any())
