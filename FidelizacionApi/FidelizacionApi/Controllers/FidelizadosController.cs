@@ -45,6 +45,15 @@ namespace FidelizacionApi.Controllers
             return await _mediator.Send(new ObtenerFidelizadosPorCentroVentaQuery(id), cancellationToken);
         }
 
+
+        [HttpGet("CentroVenta/{id}/Fidelizado/{documento}")]
+        [Authtentication.Authorize]
+        [ProducesResponseType(typeof(IEnumerable<Fidelizado>), (int)HttpStatusCode.OK)]
+        public async Task<IEnumerable<Fidelizado>> GetFidelizadosPorCentroVenta(int id, string documento, CancellationToken cancellationToken)
+        {
+            return await _mediator.Send(new ObtenerFidelizadosPorCentroVentaYDocumentoQuery(id, documento), cancellationToken);
+        }
+
         [HttpPut("{id}")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
