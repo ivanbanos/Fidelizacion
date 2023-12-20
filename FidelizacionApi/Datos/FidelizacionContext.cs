@@ -24,6 +24,7 @@ namespace Datos
         public DbSet<Usuario> Usuario { get; set; }
         public DbSet<Punto> Punto { get; set; }
         public DbSet<Perfil> Perfil { get; set; }
+        public DbSet<Redencion> Redencion { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,6 +54,12 @@ namespace Datos
                     .HasOne(u => u.Perfil)
                     .WithMany(p => p.Usuarios)
                     .HasForeignKey(u => u.PerfilId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Redencion>()
+                    .HasOne(r => r.Premio)
+                    .WithMany(p => p.Redenciones)
+                    .HasForeignKey(r => r.PremioId)
                     .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<TipoVencimiento>().HasData(new TipoVencimiento[]

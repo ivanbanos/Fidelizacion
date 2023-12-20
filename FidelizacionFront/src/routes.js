@@ -51,6 +51,7 @@ const Companias = React.lazy(() => import('./views/companias/Companias'))
 const CentroVentas = React.lazy(() => import('./views/centroVentas/CentroVentas'))
 const Fidelizados = React.lazy(() => import('./views/fidelizados/Fidelizados'))
 const Usuarios = React.lazy(() => import('./views/usuarios/Usuarios'))
+const Premios = React.lazy(() => import('./views/premios/Premios'))
 const ReporteFidelizados = React.lazy(() => import('./views/reportes/ReporteFidelizados'))
 const UpdateContrasena = React.lazy(() => import('./views/pages/updateContrasena/UpdateContrasena'))
 
@@ -105,6 +106,7 @@ const routes = [
   { path: '/centroVentas', name: 'CentroVentas', element: CentroVentas },
   { path: '/fidelizados', name: 'Fidelizados', element: Fidelizados },
   { path: '/usuarios', name: 'Usuarios', element: Usuarios },
+  { path: '/premios', name: 'Premios', element: Premios },
   { path: '/reporte/ReporteFidelizados', name: 'ReporteFidelizados', element: ReporteFidelizados },
   { path: '/actualizarContrasena', name: 'UpdateContrasena', element: UpdateContrasena },
 ]

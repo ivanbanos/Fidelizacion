@@ -4,6 +4,7 @@ using Datos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Datos.Migrations
 {
     [DbContext(typeof(FidelizacionContext))]
-    partial class FidelizacionContextModelSnapshot : ModelSnapshot
+    [Migration("20231218022200_AgreagarRedencionPremio")]
+    partial class AgreagarRedencionPremio
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -8642,9 +8644,6 @@ namespace Datos.Migrations
                     b.Property<int>("CentroVentaId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("FechaRedencion")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("FidelizadoId")
                         .HasColumnType("int");
 
@@ -8801,7 +8800,7 @@ namespace Datos.Migrations
                             Id = 1,
                             Contrasena = "$2a$11$VLwdQFPB4zzuVjRkDwm8a.AhZ8Yw6w.00YWRxwxGx5kuYQeLmRv6e",
                             EstadoId = 1,
-                            Guid = new Guid("a7ce468b-6628-428d-8b7e-023bae29183e"),
+                            Guid = new Guid("a8dee0a4-0b7e-4576-9ee0-5fd7cca61bbb"),
                             NombreUsuario = "Arthur",
                             PerfilId = 1
                         });

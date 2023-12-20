@@ -2,7 +2,7 @@ import React from 'react'
 import CIcon from '@coreui/icons-react'
 import {
   cilContact,
-  cilFactory,
+  cilGift,
   cilBuilding,
   cilDescription,
   cilSpeedometer,
@@ -34,6 +34,12 @@ const _navAdministrador = [
     name: 'Fidelizados',
     to: '/fidelizados',
     icon: <CIcon icon={cilContact} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Premios',
+    to: '/premios',
+    icon: <CIcon icon={cilGift} customClassName="nav-icon" />,
   },
   {
     component: CNavGroup,

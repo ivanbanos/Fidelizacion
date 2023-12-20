@@ -1,16 +1,9 @@
+using Aplicacion;
 using Aplicacion.Authtentication;
-using Aplicacion.Command.CentroVentas;
-using Aplicacion.Command.Compania;
-using Aplicacion.Command.Usuarios;
-using Aplicacion.Query.CentroVentas;
-using Aplicacion.Query.Compania;
-using Aplicacion.Query.Usuarios;
-using Aplicacion.Query.ValidacionUsuario;
 using Authtentication;
 using Datos;
 using Datos.Extension;
 using FidelizacionApi.Filtros;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -47,21 +40,9 @@ builder.Services.AddSwaggerGen(c =>
 
 });
 builder.Services.AddDbContext<FidelizacionContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("ConexionFidelizacion")));
-builder.Services.AddMediatR(typeof(AgregarCompaniaCommand));
-builder.Services.AddMediatR(typeof(ActualizarCompaniaCommand));
-builder.Services.AddMediatR(typeof(EliminarCompaniaCommand));
-builder.Services.AddMediatR(typeof(ObtenerCompaniaQuery));
-builder.Services.AddMediatR(typeof(ObtenerUsuariosQuery));
-builder.Services.AddMediatR(typeof(AgregarCentroVentaCommand));
-builder.Services.AddMediatR(typeof(ActualizarCentroVentaCommand));
-builder.Services.AddMediatR(typeof(EliminarCentroVentaCommand));
-builder.Services.AddMediatR(typeof(ObtenerCentroVentaQuery));
-builder.Services.AddMediatR(typeof(ObtenerCentroVentasQuery));
-builder.Services.AddMediatR(typeof(ActualizarUsuarioCommand));
-builder.Services.AddMediatR(typeof(CrearUsuarioCommand));
-builder.Services.AddMediatR(typeof(EliminarUsuarioCommand));
-builder.Services.AddMediatR(typeof(ValidacionUsuarioContrasenaQuery));
 builder.Services.AgregarRepositorios();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(IAplicacionAnclas).Assembly));
+builder.Services.AddAutoMapper(typeof(FidelizacionProfile));
 
 builder.Services.AddSingleton<IConfigureOptions<SecretSettings>, ConfigureSecretSettings>();
 builder.Services.AddSingleton<IAuthentication, JWTAuthentication>();

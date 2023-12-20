@@ -273,20 +273,44 @@ const TaskFidelizado = (props) => {
     props.Fidelizado.porcentajePuntos,
   )
   const [newTelefono, setNewTelefonoChange] = useState(
-    props.Fidelizado.informacionAdicional.telefono,
+    props.Fidelizado.informacionAdicional == null
+      ? '0000000000'
+      : props.Fidelizado.informacionAdicional.telefono,
   )
-  const [newCelular, setNewCelularChange] = useState(props.Fidelizado.informacionAdicional.celular)
+  const [newCelular, setNewCelularChange] = useState(
+    props.Fidelizado.informacionAdicional == null
+      ? ''
+      : props.Fidelizado.informacionAdicional.celular,
+  )
   const [newDireccion, setNewDireccionChange] = useState(
-    props.Fidelizado.informacionAdicional.direccion,
+    props.Fidelizado.informacionAdicional == null
+      ? ''
+      : props.Fidelizado.informacionAdicional.direccion,
   )
-  const [newEstrato, setNewEstratoChange] = useState(props.Fidelizado.informacionAdicional.estrato)
+  const [newEstrato, setNewEstratoChange] = useState(
+    props.Fidelizado.informacionAdicional == null
+      ? ''
+      : props.Fidelizado.informacionAdicional.estrato,
+  )
   const [newNumeroHijos, setNewNumeroHijosChange] = useState(
-    props.Fidelizado.informacionAdicional.numeroHijos,
+    props.Fidelizado.informacionAdicional == null
+      ? ''
+      : props.Fidelizado.informacionAdicional.numeroHijos,
   )
-  const [newSexo, setNewSexoChange] = useState(props.Fidelizado.informacionAdicional.sexoId)
-  const [newCiudad, setNewCiudad] = useState(props.Fidelizado.informacionAdicional.ciudadId)
+  const [newSexo, setNewSexoChange] = useState(
+    props.Fidelizado.informacionAdicional == null
+      ? 0
+      : props.Fidelizado.informacionAdicional.sexoId,
+  )
+  const [newCiudad, setNewCiudad] = useState(
+    props.Fidelizado.informacionAdicional == null
+      ? 1
+      : props.Fidelizado.informacionAdicional.ciudadId,
+  )
   const [newProfesion, setNewProfesion] = useState(
-    props.Fidelizado.informacionAdicional.profesionId,
+    props.Fidelizado.informacionAdicional == null
+      ? 1
+      : props.Fidelizado.informacionAdicional.profesionId,
   )
   let tipoDocumento = []
   tipoDocumento.push({ value: 1, name: 'Cedula' })

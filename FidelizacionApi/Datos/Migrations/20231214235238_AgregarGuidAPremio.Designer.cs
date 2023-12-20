@@ -4,6 +4,7 @@ using Datos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Datos.Migrations
 {
     [DbContext(typeof(FidelizacionContext))]
-    partial class FidelizacionContextModelSnapshot : ModelSnapshot
+    [Migration("20231214235238_AgregarGuidAPremio")]
+    partial class AgregarGuidAPremio
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -8631,35 +8633,6 @@ namespace Datos.Migrations
                     b.ToTable("Punto");
                 });
 
-            modelBuilder.Entity("Dominio.Entidades.Redencion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("CentroVentaId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("FechaRedencion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("FidelizadoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PremioId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FidelizadoId");
-
-                    b.HasIndex("PremioId");
-
-                    b.ToTable("Redencion");
-                });
-
             modelBuilder.Entity("Dominio.Entidades.Sexo", b =>
                 {
                     b.Property<int>("Id")
@@ -8801,7 +8774,7 @@ namespace Datos.Migrations
                             Id = 1,
                             Contrasena = "$2a$11$VLwdQFPB4zzuVjRkDwm8a.AhZ8Yw6w.00YWRxwxGx5kuYQeLmRv6e",
                             EstadoId = 1,
-                            Guid = new Guid("a7ce468b-6628-428d-8b7e-023bae29183e"),
+                            Guid = new Guid("ea8b570f-586c-4841-a487-abc066a35034"),
                             NombreUsuario = "Arthur",
                             PerfilId = 1
                         });
@@ -8963,25 +8936,6 @@ namespace Datos.Migrations
                     b.Navigation("Fidelizado");
                 });
 
-            modelBuilder.Entity("Dominio.Entidades.Redencion", b =>
-                {
-                    b.HasOne("Dominio.Entidades.Fidelizado", "Fidelizado")
-                        .WithMany()
-                        .HasForeignKey("FidelizadoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dominio.Entidades.Premio", "Premio")
-                        .WithMany("Redenciones")
-                        .HasForeignKey("PremioId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Fidelizado");
-
-                    b.Navigation("Premio");
-                });
-
             modelBuilder.Entity("Dominio.Entidades.Usuario", b =>
                 {
                     b.HasOne("Dominio.Entidades.CentroVenta", "CentroVenta")
@@ -9056,11 +9010,6 @@ namespace Datos.Migrations
             modelBuilder.Entity("Dominio.Entidades.Perfil", b =>
                 {
                     b.Navigation("Usuarios");
-                });
-
-            modelBuilder.Entity("Dominio.Entidades.Premio", b =>
-                {
-                    b.Navigation("Redenciones");
                 });
 #pragma warning restore 612, 618
         }
