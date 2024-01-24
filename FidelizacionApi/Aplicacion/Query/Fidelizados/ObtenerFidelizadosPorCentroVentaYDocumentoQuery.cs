@@ -1,14 +1,9 @@
-﻿using Dominio.Entidades;
+﻿using Aplicacion.Query.Fidelizados.Dtos;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Aplicacion.Query.Fidelizados
 {
-    public class ObtenerFidelizadosPorCentroVentaYDocumentoQuery : IRequest<IEnumerable<Fidelizado>>
+    public class ObtenerFidelizadosPorCentroVentaYDocumentoQuery : IRequest<IEnumerable<FidelizadoDto>>
     {
         public ObtenerFidelizadosPorCentroVentaYDocumentoQuery(int id, string documento)
         {
