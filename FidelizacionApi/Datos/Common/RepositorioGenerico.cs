@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace Datos.Common
 {
@@ -59,6 +60,18 @@ namespace Datos.Common
         public async Task<T> GetByIdAsync(object id)
         {
             return await _context.Set<T>().FindAsync(id);
+        }
+
+        public async Task<IEnumerable<T>> ExecuteStoredProcedure(string stroredProcedure, IDictionary<string, object> parameters)
+        {
+            var query = new StringBuilder();
+            query.Append($"EXEC {stroredProcedure} ");
+            foreach (var parameter in parameters)
+            {
+                query.Append($"@{parameter.Key} = {parameter.Value.ToString()}{(parameters.LastOrDefault().Key.Equals(parameter.Key) ? "" : ",")}");
+            }
+
+            return await _context.Set<T>().FromSqlRaw(query.ToString()).ToListAsync();
         }
 
         public async Task UpdateAsync(T entity)

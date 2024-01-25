@@ -25,9 +25,9 @@ namespace FidelizacionApi.Controllers
         [HttpGet]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<FidelizadoDto>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<FidelizadoDto>> GetFidelizados(CancellationToken cancellationToken)
+        public async Task<IEnumerable<FidelizadoDto>> GetFidelizados(string? filtro, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerFidelizadosQuery(), cancellationToken);
+            return await _mediator.Send(new ObtenerFidelizadosQuery(filtro), cancellationToken);
         }
 
         [HttpGet("{id}")]
@@ -40,16 +40,16 @@ namespace FidelizacionApi.Controllers
         [HttpGet("CentroVenta/{id}")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<FidelizadoDto>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<FidelizadoDto>> GetFidelizadosPorCentroVenta(int id, CancellationToken cancellationToken)
+        public async Task<IEnumerable<FidelizadoDto>> GetFidelizadosPorCentroVenta(int id, string? filtro, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerFidelizadosPorCentroVentaQuery(id), cancellationToken);
+            return await _mediator.Send(new ObtenerFidelizadosPorCentroVentaQuery(id, filtro), cancellationToken);
         }
 
 
         [HttpGet("CentroVenta/{id}/Fidelizado/{documento}")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<FidelizadoDto>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<FidelizadoDto>> GetFidelizadosPorCentroVenta(int id, string documento, CancellationToken cancellationToken)
+        public async Task<IEnumerable<FidelizadoDto>> GetFidelizadosPorCentroVentaYDocumento(int id, string documento, CancellationToken cancellationToken)
         {
             return await _mediator.Send(new ObtenerFidelizadosPorCentroVentaYDocumentoQuery(id, documento), cancellationToken);
         }

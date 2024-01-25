@@ -1,7 +1,9 @@
 import { React, useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import GetFidelizados from '../../services/fidelizados/GetFidelizados'
+import GetFidelizadosConFiltro from '../../services/fidelizados/GetFidelizadosConFiltro'
 import GetFidelizadosPorCentroVenta from '../../services/fidelizados/GetFidelizadosPorCentroVenta'
+import GetFidelizadosPorCentroVentaConFiltro from '../../services/fidelizados/GetFidelizadosPorCentroVentaConFiltro'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilPencil, cilX } from '@coreui/icons'
 import {
@@ -21,11 +23,10 @@ import {
   CModalTitle,
   CFormSelect,
   CForm,
-  CFormLabel,
+  CCard,
+  CCardBody,
   CInputGroup,
   CInputGroupText,
-  CFormCheck,
-  CFormFeedback,
 } from '@coreui/react'
 import AddFidelizado from 'src/services/fidelizados/AddFidelizado'
 import UpdateFidelizado from 'src/services/fidelizados/UpdateFidelizado'
@@ -714,7 +715,12 @@ const Fidelizados = () => {
   const [Fidelizados, setFidelizados] = useState([])
   const [ciudades, setCiudades] = useState([])
   const [CentroVentas, setCentroVentas] = useState([])
+  const [filtro, setFiltro] = useState()
   const toastRef = useRef()
+
+  const handleFiltroChange = (event) => {
+    setFiltro(event.target.value)
+  }
 
   const fetchFidelizados = async () => {
     let fidelizados = []
@@ -723,11 +729,7 @@ const Fidelizados = () => {
     } else {
       fidelizados = await GetFidelizadosPorCentroVenta()
     }
-    if (fidelizados === 'fail') {
-      navigate('/Login', { replace: true })
-    } else {
-      setFidelizados(fidelizados)
-    }
+    setFidelizados(fidelizados)
   }
 
   const fetchCiudades = async () => {
@@ -755,22 +757,63 @@ const Fidelizados = () => {
     fetchCentroVentas()
   }, [])
 
+  const handleSubmitFiltro = async (event) => {
+    let fidelizados = []
+    if (perfil === '1') {
+      fidelizados = await GetFidelizadosConFiltro(filtro)
+    } else {
+      fidelizados = await GetFidelizadosPorCentroVentaConFiltro(filtro)
+    }
+    setFidelizados(fidelizados)
+    event.preventDefault()
+  }
+
   return (
     <>
       <h1>Fidelizados</h1>
-      <AddFidelizadoModal
-        GetFidelizados={fetchFidelizados}
-        ciudades={ciudades}
-        Perfil={perfil}
-        CentroVentas={CentroVentas}
-      />
+
       <CRow>
+        <CCol xs={12} className="px-0">
+          <CCard>
+            <CCardBody>
+              <CForm className="row mt-1 needs-validation" onSubmit={handleSubmitFiltro}>
+                <CRow className="mb-2">
+                  <CCol xs={9}>
+                    <CInputGroup className="mb-3">
+                      <CInputGroupText id="basic-addon1">Filto:</CInputGroupText>
+                      <CFormInput
+                        placeholder="Filtro"
+                        type="text"
+                        id="filtro"
+                        onChange={handleFiltroChange}
+                      />
+                    </CInputGroup>
+                  </CCol>
+                  <CCol xs={3}>
+                    <CButton className="me-3" color="primary" type="submit">
+                      Buscar
+                    </CButton>
+                  </CCol>
+                </CRow>
+              </CForm>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+      <CRow className="mt-2">
         <CTable>
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell scope="col">Nombre</CTableHeaderCell>
               <CTableHeaderCell scope="col">Puntos</CTableHeaderCell>
-              <CTableHeaderCell scope="col"></CTableHeaderCell>
+              <CTableHeaderCell scope="col">
+                <AddFidelizadoModal
+                  GetFidelizados={fetchFidelizados}
+                  ciudades={ciudades}
+                  Perfil={perfil}
+                  CentroVentas={CentroVentas}
+                />
+              </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
