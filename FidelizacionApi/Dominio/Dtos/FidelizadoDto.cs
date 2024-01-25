@@ -1,4 +1,4 @@
-﻿namespace Aplicacion.Query.Fidelizados.Dtos
+﻿namespace Dominio.Dtos
 {
     public class FidelizadoDto
     {

@@ -1,36 +1,43 @@
 import { React, useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react'
-import { useParams } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
+import GetFidelizados from '../../services/fidelizados/GetFidelizados'
+import GetFidelizadosConFiltro from '../../services/fidelizados/GetFidelizadosConFiltro'
 import GetFidelizadosPorCentroVenta from '../../services/fidelizados/GetFidelizadosPorCentroVenta'
+import GetFidelizadosPorCentroVentaConFiltro from '../../services/fidelizados/GetFidelizadosPorCentroVentaConFiltro'
 import {
   CButton,
   CRow,
   CCol,
   CCard,
   CCardBody,
-  CCardText,
-  CCardHeader,
   CTable,
   CTableBody,
   CTableHead,
   CTableHeaderCell,
   CTableRow,
   CFormInput,
-  CFormSelect,
-  CModal,
-  CModalBody,
-  CModalFooter,
-  CModalHeader,
-  CModalTitle,
+  CForm,
+  CInputGroup,
+  CInputGroupText,
 } from '@coreui/react'
 import GetCiudades from 'src/services/configuraciones/GetCiudades'
 
 const ReporteFidelizados = () => {
+  const perfil = localStorage.getItem('perfil')
   const [fidelizados, setFidelizados] = useState([])
   const [ciudades, setCiudades] = useState([])
+  const [filtro, setFiltro] = useState()
+
+  const handleFiltroChange = (event) => {
+    setFiltro(event.target.value)
+  }
 
   const fetchFidelizados = async () => {
-    let fidelizados = await GetFidelizadosPorCentroVenta()
+    let fidelizados = []
+    if (perfil === '1') {
+      fidelizados = await GetFidelizados()
+    } else {
+      fidelizados = await GetFidelizadosPorCentroVenta()
+    }
     setFidelizados(fidelizados)
   }
 
@@ -44,35 +51,44 @@ const ReporteFidelizados = () => {
     fetchCiudades()
   }, [])
 
+  const handleSubmit = async (event) => {
+    let fidelizados = []
+    if (perfil === '1') {
+      fidelizados = await GetFidelizadosConFiltro(filtro)
+    } else {
+      fidelizados = await GetFidelizadosPorCentroVentaConFiltro(filtro)
+    }
+    setFidelizados(fidelizados)
+    event.preventDefault()
+  }
+
   return (
     <>
       <h1>Reporte Fidelizados</h1>
       <CRow>
-        <CCol xs={12}>
+        <CCol xs={12} className="px-0">
           <CCard>
-            <CCardHeader>Filtros</CCardHeader>
             <CCardBody>
-              <CCardText>
+              <CForm className="row mt-1 needs-validation" onSubmit={handleSubmit}>
                 <CRow className="mb-2">
-                  <CCol xs={3}>Documento:</CCol>
                   <CCol xs={9}>
-                    <CFormInput placeholder="Documento" />
+                    <CInputGroup className="mb-3">
+                      <CInputGroupText id="basic-addon1">Filto</CInputGroupText>
+                      <CFormInput
+                        placeholder="Filtro"
+                        type="text"
+                        id="filtro"
+                        onChange={handleFiltroChange}
+                      />
+                    </CInputGroup>
+                  </CCol>
+                  <CCol xs={3}>
+                    <CButton className="me-3" color="primary" type="submit">
+                      Buscar
+                    </CButton>
                   </CCol>
                 </CRow>
-                <CRow className="mb-2">
-                  <CCol xs={3}>Ciudad:</CCol>
-                  <CCol xs={9}>
-                    <CFormSelect aria-label="Default select example">
-                      <option>Selecione un opci&oacute;n</option>
-                      {ciudades.map((ciudad) => (
-                        <option key={ciudad.id} value={ciudad.nombre}>
-                          {ciudad.nombre}
-                        </option>
-                      ))}
-                    </CFormSelect>
-                  </CCol>
-                </CRow>
-              </CCardText>
+              </CForm>
             </CCardBody>
           </CCard>
         </CCol>

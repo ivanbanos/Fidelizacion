@@ -38,6 +38,7 @@ namespace Aplicacion
                 .ForMember(dest => dest.CiudadId, opt => opt.MapFrom(src => src.InformacionAdicional.CiudadId))
                 .ForMember(dest => dest.NombreCiudad, opt => opt.MapFrom(src => src.InformacionAdicional.Ciudad.Nombre))
                 .ForMember(dest => dest.ProfesionId, opt => opt.MapFrom(src => src.InformacionAdicional.ProfesionId));
+            CreateMap<Dominio.Dtos.FidelizadoDto, FidelizadoDto>();
         }
     }
 }
