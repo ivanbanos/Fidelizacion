@@ -36,6 +36,7 @@ namespace Aplicacion
                 .ForMember(dest => dest.NumeroHijos, opt => opt.MapFrom(src => src.InformacionAdicional.NumeroHijos))
                 .ForMember(dest => dest.SexoId, opt => opt.MapFrom(src => src.InformacionAdicional.SexoId))
                 .ForMember(dest => dest.CiudadId, opt => opt.MapFrom(src => src.InformacionAdicional.CiudadId))
+                .ForMember(dest => dest.NombreCiudad, opt => opt.MapFrom(src => src.InformacionAdicional.Ciudad.Nombre))
                 .ForMember(dest => dest.ProfesionId, opt => opt.MapFrom(src => src.InformacionAdicional.ProfesionId));
         }
     }

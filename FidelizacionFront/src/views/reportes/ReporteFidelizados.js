@@ -95,9 +95,9 @@ const ReporteFidelizados = () => {
                 <CTableHeaderCell>{fidelizado.nombre}</CTableHeaderCell>
                 <CTableHeaderCell>{fidelizado.puntos ?? 0}</CTableHeaderCell>
                 <CTableHeaderCell>{fidelizado.porcentajePuntos}</CTableHeaderCell>
-                <CTableHeaderCell>0</CTableHeaderCell>
-                <CTableHeaderCell>{fidelizado.informacionAdicional.celular}</CTableHeaderCell>
-                <CTableHeaderCell>{fidelizado.informacionAdicional.ciudad.nombre}</CTableHeaderCell>
+                <CTableHeaderCell>{fidelizado.puntosReservados ?? 0}</CTableHeaderCell>
+                <CTableHeaderCell>{fidelizado.celular}</CTableHeaderCell>
+                <CTableHeaderCell>{fidelizado.nombreCiudad}</CTableHeaderCell>
               </CTableRow>
             ))}
           </CTableBody>

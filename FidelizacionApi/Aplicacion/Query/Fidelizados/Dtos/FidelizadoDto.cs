@@ -7,6 +7,7 @@
         public int TipoDocumentoId { get; set; }
         public string Nombre { get; set; }
         public float? Puntos { get; set; }
+        public float? PuntosReservados { get; set; }
         public float PorcentajePuntos { get; set; }
         public int EstadoId { get; set; }
         public string? Telefono { get; set; }
@@ -16,6 +17,7 @@
         public int? NumeroHijos { get; set; }
         public int SexoId { get; set; }
         public int CiudadId { get; set; }
+        public string NombreCiudad { get; set; }
         public int? ProfesionId { get; set; }
     }
 }

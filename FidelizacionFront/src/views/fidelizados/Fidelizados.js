@@ -478,7 +478,7 @@ const TaskFidelizado = (props) => {
         onClose={() => setUpdateFidelizadoVisible(false)}
       >
         <CModalHeader>
-          <CModalTitle>Actualizar Compa&ntilde;ia</CModalTitle>
+          <CModalTitle>Actualizar Fidelizado</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CForm
@@ -688,7 +688,7 @@ const TaskFidelizado = (props) => {
         onClose={() => setDeleteFidelizadoVisible(false)}
       >
         <CModalHeader>
-          <CModalTitle>Eliminar Compa&ntilde;ia</CModalTitle>
+          <CModalTitle>Eliminar Fidelizado</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CRow>
