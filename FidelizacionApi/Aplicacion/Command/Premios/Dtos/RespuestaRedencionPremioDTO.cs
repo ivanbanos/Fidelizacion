@@ -10,17 +10,21 @@
         public string NombreCentroVenta { get; set; }
         public string CedulaFidelizado { get; set; }
         public string NombreFidelizado { get; set; }
+        public float PuntosRestantes { get; set; }
 
-        public RespuestaRedencionPremioDTO(int puntosConsumidos, string descripcioPremio, int cantidadPremio, string fechaRedencion, string ciudadCentroVenta, string nombreCentroVenta, string cedulaFidelizado, string nombreFidelizado)
+        public RespuestaRedencionPremioDTO(int puntosConsumidos, string descripcioPremio, int cantidadPremio, 
+                                            string fechaRedencion, string ciudadCentroVenta, string nombreCentroVenta, 
+                                            string cedulaFidelizado, string nombreFidelizado, float puntosRestantes)
         {
             PuntosConsumidos = puntosConsumidos;
             DescripcioPremio = descripcioPremio;
             CantidadPremio = cantidadPremio;
             FechaRedencion = fechaRedencion;
             CiudadCentroVenta = ciudadCentroVenta;
-            NombreCentroVenta= nombreCentroVenta;
+            NombreCentroVenta = nombreCentroVenta;
             CedulaFidelizado = cedulaFidelizado;
             NombreFidelizado = nombreFidelizado;
+            PuntosRestantes = puntosRestantes;
         }
     }
 }

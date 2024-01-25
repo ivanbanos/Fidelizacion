@@ -24,18 +24,14 @@ const RedimirPremio = async (premioId, cantidad, documentoFidelizado, centroVent
       },
     })
     if (response.status === 200) {
-      console.log('entro aquí 1')
       let premio = await response.json()
       return premio
     }
     if (response.status === 403) {
-      console.log('entro aquí 2')
       return 'fail'
     }
-    console.log('entro aquí 3')
     return 'fail'
   } catch (error) {
-    console.log('entro aquí 4')
     return 'fail'
   }
 }
