@@ -9,6 +9,7 @@ namespace Datos.Common
             bool isTracking = false);
 
         Task<T> GetByIdAsync(object id);
+        Task<IEnumerable<T>> ExecuteStoredProcedure(string stroredProcedure, IDictionary<string, object> parameters);
         Task<T> AddAsync(T entity);
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);

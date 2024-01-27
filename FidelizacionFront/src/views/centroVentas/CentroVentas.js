@@ -296,7 +296,7 @@ const TaskCentroVenta = (props) => {
         onClose={() => setDeleteCentroVentaVisible(false)}
       >
         <CModalHeader>
-          <CModalTitle>Eliminar Compa&ntilde;ia</CModalTitle>
+          <CModalTitle>Eliminar Centro de Venta</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CRow>

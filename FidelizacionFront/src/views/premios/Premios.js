@@ -205,9 +205,7 @@ const TaskPremio = (props) => {
       newDocumentoFidelizado,
       centroVenta,
     )
-    respuesta2 = respuesta
-    console.log(respuesta2)
-    setRespuestaRedecionPremio(respuesta2)
+    setRespuestaRedecionPremio(respuesta)
     props.GetPremios()
     setRedimirPremioVisible(false)
     setRespuestaRedimirPremioVisible(true)
@@ -233,7 +231,9 @@ const TaskPremio = (props) => {
             ${respuestaRedecionPremio.puntosConsumidos} puntos.
           </p>
           <br />
-          <br />
+          <p>
+            Quedando un saldo disponibles ${respuestaRedecionPremio.puntosRestantes} puntos.
+          </p>
           <br />
           <br />
           <p>____________________________ </p>
@@ -420,7 +420,9 @@ const TaskPremio = (props) => {
               {respuestaRedecionPremio.puntosConsumidos} puntos.
             </p>
             <br />
-            <br />
+            <p>
+              Quedando un saldo disponibles de {respuestaRedecionPremio.puntosRestantes} puntos.
+            </p>
             <br />
             <br />
             <p>____________________________ </p>

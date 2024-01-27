@@ -56,11 +56,14 @@ namespace Aplicacion.Command.Premios
                 throw new ApiException() { ExceptionMessage = "No cuenta con la cantidad de puntos necesarios para el reclamo", StatusCode = HttpStatusCode.BadRequest };
 
             fidelizado.Puntos = fidelizado.Puntos - premio.Puntos * request.Cantidad;
+            fidelizado.FechaUltimoReclamo = DateTime.Now;
 
             var redencion = await _repositorioRedencion.AddAsync(new Redencion(premio.Id, fidelizado.Id, centroVenta.Id));
             await _repositorioFidelizado.UpdateAsync(fidelizado);
 
-            return new RespuestaRedencionPremioDTO(premio.Puntos * request.Cantidad, premio.Nombre, request.Cantidad, redencion.FechaRedencion.ToString("dd/MM/yyyy, HH:mm:ss"), centroVenta.Ciudad.Nombre, centroVenta.Nombre, fidelizado.Documento, fidelizado.Nombre);
+            return new RespuestaRedencionPremioDTO(premio.Puntos * request.Cantidad, premio.Nombre, request.Cantidad, 
+                                                redencion.FechaRedencion.ToString("dd/MM/yyyy, HH:mm:ss"), centroVenta.Ciudad.Nombre, centroVenta.Nombre, 
+                                                fidelizado.Documento, fidelizado.Nombre, fidelizado.Puntos.Value);
         }
     }
 }
