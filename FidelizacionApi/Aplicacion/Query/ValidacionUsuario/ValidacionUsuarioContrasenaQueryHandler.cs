@@ -27,7 +27,7 @@ namespace Aplicacion.Query.ValidacionUsuario
         {
             if (string.IsNullOrEmpty(request.NombreUsuario) || string.IsNullOrEmpty(request.Contrasena))
             {
-                throw new ApiException() { ExceptionMessage = "", StatusCode = HttpStatusCode.BadRequest };
+                throw new ApiException() { ExceptionMessage = "Debe enviar información de inicio de sesión", StatusCode = HttpStatusCode.BadRequest };
             }
             var usuarios = await _repositorioGenerico.GetAsync(u => u.NombreUsuario.Equals(request.NombreUsuario), includeProperties: "CentroVenta");
             var usuario = usuarios.FirstOrDefault();
@@ -38,7 +38,7 @@ namespace Aplicacion.Query.ValidacionUsuario
             }
             else
             {
-                throw new ApiException() { ExceptionMessage = "", StatusCode = HttpStatusCode.Forbidden };
+                throw new ApiException() { ExceptionMessage = "Error al iniciar sesión", StatusCode = HttpStatusCode.Forbidden };
             }
         }
     }

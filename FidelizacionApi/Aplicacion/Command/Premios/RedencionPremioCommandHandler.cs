@@ -52,7 +52,7 @@ namespace Aplicacion.Command.Premios
 
             var premio = premios.FirstOrDefault();
 
-            if (fidelizado.Puntos - (fidelizado.PuntosReservados ?? 0) < premio.Puntos * request.Cantidad)
+            if (fidelizado.Puntos < premio.Puntos * request.Cantidad)
                 throw new ApiException() { ExceptionMessage = "No cuenta con la cantidad de puntos necesarios para el reclamo", StatusCode = HttpStatusCode.BadRequest };
 
             fidelizado.Puntos = fidelizado.Puntos - premio.Puntos * request.Cantidad;

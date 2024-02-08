@@ -34,7 +34,6 @@ const AddFidelizado = async (
       profesionId: profesion === 0 ? null : profesion,
       usuario: idUsuario,
     }
-    console.log(body)
     const response = await fetch(configData.SERVER_URL + '/api/Fidelizados', {
       method: 'POST',
       mode: 'cors',
@@ -51,14 +50,14 @@ const AddFidelizado = async (
     })
     if (response.status === 200) {
       let fidelizado = await response.json()
-      return fidelizado
+      return { status: response.status, response: fidelizado }
     }
-    if (response.status === 403) {
-      return 'fail'
+    if (response.status === 400 || response.status === 403 || response.status === 500) {
+      return { status: response.status, response: await response.text() }
     }
-    return 'fail'
+    return { status: response.status, response: await response.text() }
   } catch (error) {
-    return 'fail'
+    return { status: 500, response: error }
   }
 }
 

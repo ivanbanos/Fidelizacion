@@ -19,51 +19,58 @@ import {
   CInputGroup,
   CInputGroupText,
 } from '@coreui/react'
-import GetCiudades from 'src/services/configuraciones/GetCiudades'
+import Toast from '../notifications/toasts/Toasts'
 
 const ReporteFidelizados = () => {
   const perfil = localStorage.getItem('perfil')
   const [fidelizados, setFidelizados] = useState([])
-  const [ciudades, setCiudades] = useState([])
   const [filtro, setFiltro] = useState()
+  const toastRef = useRef()
 
   const handleFiltroChange = (event) => {
     setFiltro(event.target.value)
   }
 
   const fetchFidelizados = async () => {
-    let fidelizados = []
+    let resultado = []
     if (perfil === '1') {
-      fidelizados = await GetFidelizados()
+      resultado = await GetFidelizados()
     } else {
-      fidelizados = await GetFidelizadosPorCentroVenta()
+      resultado = await GetFidelizadosPorCentroVenta()
     }
-    setFidelizados(fidelizados)
-  }
 
-  const fetchCiudades = async () => {
-    let ciudades = await GetCiudades()
-    setCiudades(ciudades)
+    if (resultado.status === 400 || resultado.status === 500) {
+      toastRef.current.showToast(resultado.response, 'danger')
+    }
+    if (resultado.status === 200) {
+      setFidelizados(resultado.response)
+    }
   }
 
   useEffect(() => {
     fetchFidelizados()
-    fetchCiudades()
   }, [])
 
   const handleSubmit = async (event) => {
-    let fidelizados = []
+    let resultado = []
     if (perfil === '1') {
-      fidelizados = await GetFidelizadosConFiltro(filtro)
+      resultado = await GetFidelizadosConFiltro(filtro)
     } else {
-      fidelizados = await GetFidelizadosPorCentroVentaConFiltro(filtro)
+      resultado = await GetFidelizadosPorCentroVentaConFiltro(filtro)
     }
-    setFidelizados(fidelizados)
+
+    if (resultado.status === 400 || resultado.status === 500) {
+      toastRef.current.showToast(resultado.response, 'danger')
+    }
+    if (resultado.status === 200) {
+      setFidelizados(resultado.response)
+    }
     event.preventDefault()
   }
 
   return (
     <>
+      <Toast ref={toastRef}></Toast>
       <h1>Reporte Fidelizados</h1>
       <CRow>
         <CCol xs={12} className="px-0">

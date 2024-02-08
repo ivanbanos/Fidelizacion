@@ -1,5 +1,6 @@
 ﻿using Aplicacion.Exepciones;
 using Aplicacion.Extension;
+using AutoMapper;
 using Datos.Common;
 using Dominio.Common.Enum;
 using Dominio.Entidades;
@@ -13,24 +14,31 @@ namespace Aplicacion.Command.Usuarios
     {
         private readonly ILogger<CrearUsuarioCommandHandler> _logger;
         private readonly IRepositorioGenerico<Usuario> _repositorioGenerico;
+        private readonly IMapper _mapper;
 
-        public CrearUsuarioCommandHandler(ILogger<CrearUsuarioCommandHandler> logger, IRepositorioGenerico<Usuario> repositorioGenerico)
+        public CrearUsuarioCommandHandler(ILogger<CrearUsuarioCommandHandler> logger, 
+                                    IRepositorioGenerico<Usuario> repositorioGenerico,
+                                    IMapper mapper)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _repositorioGenerico = repositorioGenerico ?? throw new ArgumentNullException(nameof(repositorioGenerico));
+            _mapper = mapper;
         }
 
         public async Task<bool> Handle(CrearUsuarioCommand request, CancellationToken cancellationToken)
         {
-            var usuario = await _repositorioGenerico.GetAsync(u => u.NombreUsuario.Equals(request.Usuario.NombreUsuario) 
-                                                                    && u.CentroVentaId == request.Usuario.CentroVentaId);
-            if(usuario.Any())
+            var usuarios = await _repositorioGenerico.GetAsync(u => u.NombreUsuario.Equals(request.NombreUsuario) 
+                                                                    && u.CentroVentaId == request.CentroVentaId);
+            if(usuarios.Any())
                 throw new ApiException() { ExceptionMessage = "Nombre de usuario ya existe", StatusCode = HttpStatusCode.BadRequest };
 
-            request.Usuario.EstadoId = (int)EstadoEnum.Activo;
-            request.Usuario.Contrasena = request.Usuario.NombreUsuario.Hash();
+            var usuario = new Usuario(request.NombreUsuario, request.Perfil, request.CentroVentaId)
+            {
+                EstadoId = (int)EstadoEnum.Activo,
+                Contrasena = request.NombreUsuario.Hash()
+            };
 
-            await _repositorioGenerico.AddAsync(request.Usuario);
+            await _repositorioGenerico.AddAsync(usuario);
             return true;
         }
     }

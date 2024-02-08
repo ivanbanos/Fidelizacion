@@ -12,7 +12,7 @@ namespace FidelizacionApi.Filtros
         {
             if (context.Exception is ApiException exception)
             {
-                context.Result = new ObjectResult(exception.Message) { 
+                context.Result = new ObjectResult(exception.ExceptionMessage) { 
                  StatusCode = (int)exception.StatusCode,
                 };
 

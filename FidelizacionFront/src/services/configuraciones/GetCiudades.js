@@ -17,14 +17,14 @@ const GetCiudades = async () => {
     })
     if (response.status === 200) {
       let ciudades = await response.json()
-      return ciudades
+      return { status: response.status, response: ciudades }
     }
-    if (response.status === 403) {
-      return 'fail'
+    if (response.status === 400 || response.status === 403 || response.status === 500) {
+      return { status: response.status, response: await response.text() }
     }
-    return 'fail'
+    return { status: response.status, response: await response.text() }
   } catch (error) {
-    return 'fail'
+    return { status: 500, response: error }
   }
 }
 

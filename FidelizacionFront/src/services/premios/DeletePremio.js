@@ -21,15 +21,15 @@ const DeletePremio = async (premioId) => {
       },
     })
     if (response.status === 200) {
-      let respuesta = await response.json()
-      return respuesta
+      let premio = await response.json()
+      return { status: response.status, response: premio }
     }
-    if (response.status === 403) {
-      return 'fail'
+    if (response.status === 400 || response.status === 403 || response.status === 500) {
+      return { status: response.status, response: await response.text() }
     }
-    return 'fail'
+    return { status: response.status, response: await response.text() }
   } catch (error) {
-    return 'fail'
+    return { status: 500, response: error }
   }
 }
 

@@ -19,6 +19,7 @@ import {
   CModalFooter,
   CModalHeader,
   CModalTitle,
+  CForm,
   CFormSelect,
 } from '@coreui/react'
 import AddCentroVenta from 'src/services/centroVentas/AddCentroVenta'
@@ -26,9 +27,11 @@ import UpdateCentroVenta from 'src/services/centroVentas/UpdateCentroVenta'
 import DeleteCentroVenta from 'src/services/centroVentas/DeleteCentroVenta'
 import GetCiudades from 'src/services/configuraciones/GetCiudades'
 import GetCompanias from '../../services/companias/GetCompanias'
+import Toast from '../notifications/toasts/Toasts'
 
 const AddCentroVentaModal = (props) => {
   const idCompania = localStorage.getItem('idCompania')
+  const [validated, setValidated] = useState(false)
   const [addCentroVentaVisible, setAddCentroVentaVisible] = useState(false)
   const [inputCompaniaVisible, setCompaniaVisible] = useState(props.Perfil === '1')
   const [newNit, setNewNit] = useState()
@@ -38,6 +41,7 @@ const AddCentroVentaModal = (props) => {
   const [newValorPorPunto, setNewValorPorPuntoChange] = useState()
   const [newCiudad, setNewCiudad] = useState()
   const [newCompania, setNewCompania] = useState(idCompania)
+
   const handleNitChange = (event) => {
     setNewNit(event.target.value)
   }
@@ -59,18 +63,33 @@ const AddCentroVentaModal = (props) => {
   const handleCompaniaChange = (event) => {
     setNewCompania(event.target.value)
   }
-  const addCentroVenta = async () => {
-    await AddCentroVenta(
-      newNit,
-      newNombre,
-      newDireccion,
-      newTelefono,
-      newValorPorPunto,
-      newCiudad,
-      newCompania === '0' ? null : newCompania,
-    )
-    props.GetCentroVentas()
-    setAddCentroVentaVisible(false)
+  const handleSubmit = async (event) => {
+    const form = event.currentTarget
+    if (form.checkValidity() === false) {
+      event.preventDefault()
+      event.stopPropagation()
+      setValidated(true)
+    }
+    if (form.checkValidity() === true) {
+      let resultado = await AddCentroVenta(
+        newNit,
+        newNombre,
+        newDireccion,
+        newTelefono,
+        newValorPorPunto,
+        newCiudad,
+        newCompania === '0' ? null : newCompania,
+      )
+      props.GetCentroVentas()
+      setValidated(false)
+      if (resultado.status === 400 || resultado.status === 500) {
+        props.toast.current.showToast(resultado.response, 'danger')
+      }
+      if (resultado.status === 200) {
+        props.toast.current.showToast('Centro de venta agregado con exito', 'success')
+        setAddCentroVentaVisible(false)
+      }
+    }
   }
 
   return (
@@ -87,73 +106,124 @@ const AddCentroVentaModal = (props) => {
           <CModalTitle>Agregar Centro de Venta</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CRow className="mb-2">
-            <CCol xs={3}>Nit*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Nit" onChange={handleNitChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Nombre*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Nombre" onChange={handleNombreChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Direcci&oacute;n*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Direcci&oacute;n" onChange={handleDireccionChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Tel&eacute;fono*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Tel&eacute;fono" onChange={handleTelefonoChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Valor por punto*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Varlor por punto" onChange={handleValorPorPuntoChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Ciudad*:</CCol>
-            <CCol xs={9}>
-              <CFormSelect aria-label="Default select example" onChange={handleCiudadChange}>
-                <option>Selecione un opcion</option>
-                {props.ciudades.map((ciudad) => (
-                  <option key={ciudad.id} value={ciudad.id}>
-                    {ciudad.nombre}
-                  </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-          </CRow>
-          {inputCompaniaVisible && (
+          <CForm
+            className="row g-3 mt-1 needs-validation"
+            noValidate
+            validated={validated}
+            onSubmit={handleSubmit}
+          >
             <CRow className="mb-2">
-              <CCol xs={3}>Compa&ntilde;ia*:</CCol>
+              <CCol xs={3}>Nit*:</CCol>
               <CCol xs={9}>
-                <CFormSelect aria-label="Default select example" onChange={handleCompaniaChange}>
-                  <option>Selecione un opcion</option>
-                  {props.Companias.map((compania) => (
-                    <option key={compania.id} value={compania.id}>
-                      {compania.nombre}
+                <CFormInput
+                  placeholder="Nit"
+                  type="number"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleNitChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Nombre*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Nombre"
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleNombreChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Direcci&oacute;n*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Direcci&oacute;n"
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleDireccionChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Tel&eacute;fono*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Tel&eacute;fono"
+                  type="number"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleTelefonoChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Valor por punto*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Varlor por punto"
+                  feedbackInvalid="Este campo es requerido"
+                  type="number"
+                  onChange={handleValorPorPuntoChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Ciudad*:</CCol>
+              <CCol xs={9}>
+                <CFormSelect
+                  aria-label="Ciudad"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleCiudadChange}
+                  required
+                >
+                  <option selected="" value="">
+                    Seleccione una opci&oacute;n
+                  </option>
+                  {props.ciudades.map((ciudad) => (
+                    <option key={ciudad.id} value={ciudad.id}>
+                      {ciudad.nombre}
                     </option>
                   ))}
                 </CFormSelect>
               </CCol>
             </CRow>
-          )}
+            {inputCompaniaVisible && (
+              <CRow className="mb-2">
+                <CCol xs={3}>Compa&ntilde;ia*:</CCol>
+                <CCol xs={9}>
+                  <CFormSelect
+                    aria-label="Compa&ntilde;ia"
+                    feedbackInvalid="Este campo es requerido"
+                    onChange={handleCompaniaChange}
+                    required
+                  >
+                    <option selected="" value="">
+                      Selecione un opcion
+                    </option>
+                    {props.Companias.map((compania) => (
+                      <option key={compania.id} value={compania.id}>
+                        {compania.nombre}
+                      </option>
+                    ))}
+                  </CFormSelect>
+                </CCol>
+              </CRow>
+            )}
+            <CModalFooter>
+              <CButton color="secondary" onClick={() => setAddCentroVentaVisible(false)}>
+                Cerrar
+              </CButton>
+              <CButton color="primary" type="submit">
+                Agregar
+              </CButton>
+            </CModalFooter>
+          </CForm>
         </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setAddCentroVentaVisible(false)}>
-            Cerrar
-          </CButton>
-          <CButton color="primary" onClick={addCentroVenta}>
-            Agregar
-          </CButton>
-        </CModalFooter>
       </CModal>
     </>
   )
@@ -162,12 +232,12 @@ const AddCentroVentaModal = (props) => {
 const TaskCentroVenta = (props) => {
   const [updateCentroVentaVisible, setUpdateCentroVentaVisible] = useState(false)
   const [deleteCentroVentaVisible, setDeleteCentroVentaVisible] = useState(false)
+  const [validated, setValidated] = useState(false)
   const [newNit, setNewNit] = useState(props.CentroVenta.nit)
   const [newNombre, setNewNombre] = useState(props.CentroVenta.nombre)
   const [newDireccion, setNewDireccionChange] = useState(props.CentroVenta.direccion)
   const [newTelefono, setNewTelefonoChange] = useState(props.CentroVenta.telefono)
   const [newValorPorPunto, setNewValorPorPuntoChange] = useState(props.CentroVenta.valorPorPunto)
-  const [newCiudad, setNewCiudad] = useState(props.CentroVenta.ciudadId)
   const handleNitChange = (event) => {
     setNewNit(event.target.value)
   }
@@ -183,26 +253,44 @@ const TaskCentroVenta = (props) => {
   const handleValorPorPuntoChange = (event) => {
     setNewValorPorPuntoChange(event.target.value)
   }
-  const handleCiudadChange = (event) => {
-    setNewCiudad(event.target.value)
+
+  const handleSubmit = async (event) => {
+    const form = event.currentTarget
+    if (form.checkValidity() === false) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    setValidated(true)
+    if (form.checkValidity() === true) {
+      let centroVenta = props.CentroVenta
+      centroVenta.nit = newNit
+      centroVenta.nombre = newNombre
+      centroVenta.direccion = newDireccion
+      centroVenta.telefono = newTelefono
+      centroVenta.valorPorPunto = newValorPorPunto
+      let resultado = await UpdateCentroVenta(props.CentroVenta)
+      props.GetCentroVentas()
+      setValidated(false)
+      if (resultado.status === 400 || resultado.status === 500) {
+        props.toast.current.showToast(resultado.response, 'danger')
+      }
+      if (resultado.status === 200) {
+        props.toast.current.showToast('Centro de venta actualizado con exito', 'success')
+        setUpdateCentroVentaVisible(false)
+      }
+    }
   }
 
-  const updateCentroVenta = async () => {
-    let centroVenta = props.CentroVenta
-    centroVenta.nit = newNit
-    centroVenta.nombre = newNombre
-    centroVenta.direccion = newDireccion
-    centroVenta.telefono = newTelefono
-    centroVenta.valorPorPunto = newValorPorPunto
-    centroVenta.ciudadId = newCiudad
-    await UpdateCentroVenta(props.CentroVenta)
-    props.GetCentroVentas()
-    setUpdateCentroVentaVisible(false)
-  }
   const deleteCentroVenta = async () => {
-    await DeleteCentroVenta(props.CentroVenta)
+    let resultado = await DeleteCentroVenta(props.CentroVenta)
+    if (resultado.status === 400 || resultado.status === 500) {
+      props.toast.current.showToast(resultado.response, 'danger')
+    }
     props.GetCentroVentas()
     setDeleteCentroVentaVisible(false)
+    if (resultado.status === 200) {
+      props.toast.current.showToast('Centro de venta eliminado con exito', 'success')
+    }
   }
 
   return (
@@ -219,73 +307,87 @@ const TaskCentroVenta = (props) => {
           <CModalTitle>Actualizar Centro de Venta</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CRow className="mb-2">
-            <CCol xs={3}>Nit:</CCol>
-            <CCol xs={9}>
-              <CFormInput value={newNit} placeholder="Nit" onChange={handleNitChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Nombre:</CCol>
-            <CCol xs={9}>
-              <CFormInput value={newNombre} placeholder="Nombre" onChange={handleNombreChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Direcci&oacute;n:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                value={newDireccion}
-                placeholder="Direccion"
-                onChange={handleDireccionChange}
-              />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Tel&eacute;fono:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                value={newTelefono}
-                placeholder="Tel&eacute;fono"
-                onChange={handleTelefonoChange}
-              />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Valor por punto:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                value={newValorPorPunto}
-                placeholder="Valor por punto"
-                onChange={handleValorPorPuntoChange}
-              />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Ciudad:</CCol>
-            <CCol xs={9}>
-              <CFormSelect
-                value={newCiudad}
-                aria-label="Default select example"
-                onChange={handleCiudadChange}
-              >
-                {props.ciudades.map((ciudad) => (
-                  <option key={ciudad.id} value={ciudad.id}>
-                    {ciudad.nombre}
-                  </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-          </CRow>
+          <CForm
+            className="row g-3 mt-1 needs-validation"
+            noValidate
+            validated={validated}
+            onSubmit={handleSubmit}
+          >
+            <CRow className="mb-2">
+              <CCol xs={3}>Nit*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Nit"
+                  value={newNit}
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleNitChange}
+                  readOnly
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Nombre*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Nombre"
+                  value={newNombre}
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleNombreChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Direcci&oacute;n*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Direcci&oacute;n"
+                  value={newDireccion}
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleDireccionChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Tel&eacute;fono:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Tel&eacute;fono*"
+                  value={newTelefono}
+                  type="number"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleTelefonoChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Valor por punto*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Varlor por punto"
+                  value={newValorPorPunto}
+                  feedbackInvalid="Este campo es requerido"
+                  type="number"
+                  onChange={handleValorPorPuntoChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CModalFooter>
+              <CButton color="secondary" onClick={() => setUpdateCentroVentaVisible(false)}>
+                Cerrar
+              </CButton>
+              <CButton color="primary" type="submit">
+                Actualizar
+              </CButton>
+            </CModalFooter>
+          </CForm>
         </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setUpdateCentroVentaVisible(false)}>
-            Cerrar
-          </CButton>
-          <CButton color="primary" onClick={updateCentroVenta}>
-            Actualizar
-          </CButton>
-        </CModalFooter>
       </CModal>
       <CButton style={{ margin: '2pt' }} onClick={() => setDeleteCentroVentaVisible(true)}>
         <CIcon icon={cilX} size="sm" />
@@ -318,43 +420,60 @@ const TaskCentroVenta = (props) => {
 
 const CentroVentas = () => {
   let navigate = useNavigate()
-  const perfil = localStorage.getItem('perfil')
+  const perfil = localStorage.getItem('perfil') !== null ? localStorage.getItem('perfil') : 'null'
   const [CentroVentas, setCentroVentas] = useState([])
   const [Companias, setCompania] = useState([])
   const [ciudades, setCiudades] = useState([])
   const toastRef = useRef()
 
   const fetchCentroVentas = async () => {
-    let CentroVentas = []
-    if (perfil === '1') {
-      CentroVentas = await GetCentroVentas()
-    } else {
-      CentroVentas = await GetCentroVentaPorCompania()
-    }
-
-    if (CentroVentas === 'fail') {
-      navigate('/Login', { replace: true })
-    }
-
     if (perfil !== '1' && perfil !== '2') {
       navigate('/dashboard', { replace: true })
     }
-
-    setCentroVentas(CentroVentas)
+    let resultado = []
+    if (perfil === '1') {
+      resultado = await GetCentroVentas()
+    } else {
+      resultado = await GetCentroVentaPorCompania()
+    }
+    if (resultado.status === 401) {
+      navigate('/Login', { replace: true })
+    }
+    if (resultado.status === 400 || resultado.status === 500) {
+      toastRef.current.showToast(resultado.response, 'danger')
+    }
+    if (resultado.status === 200) {
+      setCentroVentas(resultado.response)
+    }
   }
 
   const fetchCiudades = async () => {
-    let ciudades = await GetCiudades()
-    setCiudades(ciudades)
+    let ciudadesResultado = await GetCiudades()
+    if (ciudadesResultado.status === 401) {
+      navigate('/Login', { replace: true })
+    }
+    if (ciudadesResultado.status === 400 || ciudadesResultado.status === 500) {
+      toastRef.current.showToast(ciudadesResultado.response, 'danger')
+    }
+    if (ciudadesResultado.status === 200) {
+      setCiudades(ciudadesResultado.response)
+    }
   }
 
   const fetchCompanias = async () => {
-    let Companias = await GetCompanias()
-    if (Companias === 'fail') {
+    if (perfil !== '1') {
+      navigate('/dashboard', { replace: true })
+    }
+    let resultado = await GetCompanias()
+    if (resultado.status === 401) {
       navigate('/Login', { replace: true })
     }
-
-    setCompania(Companias)
+    if (resultado.status === 400 || resultado.status === 500) {
+      toastRef.current.showToast(resultado.response, 'danger')
+    }
+    if (resultado.status === 200) {
+      setCompania(resultado.response)
+    }
   }
 
   useEffect(() => {
@@ -365,25 +484,28 @@ const CentroVentas = () => {
 
   return (
     <>
+      <Toast ref={toastRef}></Toast>
       <h1>Centro de Ventas</h1>
-      <AddCentroVentaModal
-        GetCentroVentas={fetchCentroVentas}
-        ciudades={ciudades}
-        Companias={Companias}
-        Perfil={perfil}
-      />
       <CRow>
-        <CTable>
-          <CTableHead>
+        <CTable align="middle" bordered small hover>
+          <CTableHead align="middle">
             <CTableRow>
               <CTableHeaderCell scope="col">Nit</CTableHeaderCell>
               <CTableHeaderCell scope="col">Nombre</CTableHeaderCell>
               <CTableHeaderCell scope="col">Valor Por Punto</CTableHeaderCell>
               <CTableHeaderCell scope="col">Tel&eacute;fono</CTableHeaderCell>
-              <CTableHeaderCell scope="col"></CTableHeaderCell>
+              <CTableHeaderCell scope="col">
+                <AddCentroVentaModal
+                  GetCentroVentas={fetchCentroVentas}
+                  ciudades={ciudades}
+                  Companias={Companias}
+                  Perfil={perfil}
+                  toast={toastRef}
+                />
+              </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
-          <CTableBody>
+          <CTableBody align="middle">
             {CentroVentas.map((CentroVenta) => (
               <CTableRow key={CentroVenta.id}>
                 <CTableHeaderCell>{CentroVenta.nit}</CTableHeaderCell>
@@ -397,6 +519,7 @@ const CentroVentas = () => {
                     CentroVenta={CentroVenta}
                     Companias={Companias}
                     Perfil={perfil}
+                    toast={toastRef}
                   />
                 </CTableHeaderCell>
               </CTableRow>

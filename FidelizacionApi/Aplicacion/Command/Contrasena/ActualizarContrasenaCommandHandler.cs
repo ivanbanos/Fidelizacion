@@ -1,8 +1,10 @@
-﻿using Aplicacion.Extension;
+﻿using Aplicacion.Exepciones;
+using Aplicacion.Extension;
 using Datos.Common;
 using Dominio.Entidades;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace Aplicacion.Command.Contrasena
 {
@@ -26,7 +28,7 @@ namespace Aplicacion.Command.Contrasena
             {
                 var usuario = usuarios.FirstOrDefault();
                 if (usuario == null)
-                    return false;
+                    throw new ApiException() { ExceptionMessage = "Usuario no existe", StatusCode = HttpStatusCode.BadRequest };
 
                 usuario.Contrasena = request.Contrasena.Hash();
                 await _repositorioGenerico.UpdateAsync(usuario);
@@ -36,11 +38,9 @@ namespace Aplicacion.Command.Contrasena
             var fidelizados = await _repositorioGenericoFidelizado.GetAsync(f => f.Guid.Equals(request.Usuario));
 
             if (fidelizados == null)
-                return false;
+                throw new ApiException() { ExceptionMessage = "Fidelizado no existe", StatusCode = HttpStatusCode.BadRequest };
 
             var fidelizado = fidelizados.FirstOrDefault();
-            if (fidelizado == null)
-                return false;
 
             fidelizado.Contrasena = request.Contrasena.Hash();
             await _repositorioGenericoFidelizado.UpdateAsync(fidelizado);

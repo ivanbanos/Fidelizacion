@@ -1,15 +1,29 @@
-﻿using Dominio.Entidades;
-using MediatR;
+﻿using MediatR;
 
 namespace Aplicacion.Command.CentroVentas
 {
     public class ActualizarCentroVentaCommand : IRequest<bool>
     {
-        public CentroVenta CentroVenta { get; }
+        public int Id { get; }
+        public string Nit { get; set; }
+        public string Nombre { get; set; }
+        public string Direccion { get; set; }
+        public string Telefono { get; set; }
+        public int ValorPorPunto { get; set; }
 
-        public ActualizarCentroVentaCommand(CentroVenta centroVenta)
+        public ActualizarCentroVentaCommand(int id, 
+            string nit, 
+            string nombre, 
+            string direccion, 
+            string telefono, 
+            int valorPorPunto)
         {
-            CentroVenta = centroVenta;
+            Id = id;
+            Nit = nit;
+            Nombre = nombre;
+            Direccion = direccion;
+            Telefono = telefono;
+            ValorPorPunto = valorPorPunto;
         }
     }
 }

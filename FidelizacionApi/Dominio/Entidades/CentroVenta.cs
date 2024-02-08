@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Dominio.Common.Enum;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dominio.Entidades
 {
@@ -19,7 +20,7 @@ namespace Dominio.Entidades
         public virtual Compania? Compania { get; set; }
         public int CiudadId { get; set; }
         public virtual Ciudad? Ciudad { get; set; }
-        public int EstadoId { get; set; }
+        public int EstadoId { get; set; } = (int)EstadoEnum.Activo;
         public virtual Estado? Estado { get; set; }
         public virtual IEnumerable<Usuario>? Usuarios { get; set; }
     }
