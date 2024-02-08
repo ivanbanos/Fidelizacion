@@ -1,8 +1,8 @@
 ﻿
 using Aplicacion.Command.Fidelizados;
+using Aplicacion.Exepciones;
 using Aplicacion.Query.Fidelizados;
 using Aplicacion.Query.Fidelizados.Dtos;
-using Dominio.Entidades;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -25,62 +25,118 @@ namespace FidelizacionApi.Controllers
         [HttpGet]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<FidelizadoDto>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<FidelizadoDto>> GetFidelizados(string? filtro, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetFidelizados(string? filtro, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerFidelizadosQuery(filtro), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerFidelizadosQuery(filtro), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenia fidelizados.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpGet("{id}")]
         [Authtentication.Authorize]
-        public async Task<ActionResult<FidelizadoDto>> GetFidelizado(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetFidelizado(int id, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerFidelizadoQuery(id), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerFidelizadoQuery(id), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenia fidelizado con id - {id}.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpGet("CentroVenta/{id}")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<FidelizadoDto>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<FidelizadoDto>> GetFidelizadosPorCentroVenta(int id, string? filtro, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetFidelizadosPorCentroVenta(int id, string? filtro, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerFidelizadosPorCentroVentaQuery(id, filtro), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerFidelizadosPorCentroVentaQuery(id, filtro), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenia fidelizados del centro de venta con id - {id}.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
 
         [HttpGet("CentroVenta/{id}/Fidelizado/{documento}")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<FidelizadoDto>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<FidelizadoDto>> GetFidelizadosPorCentroVentaYDocumento(int id, string documento, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetFidelizadosPorCentroVentaYDocumento(int id, string documento, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerFidelizadosPorCentroVentaYDocumentoQuery(id, documento), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerFidelizadosPorCentroVentaYDocumentoQuery(id, documento), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenia fidelizado del centro de venta con id - {id} y documento - {documento}.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpPut("{id}")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Put(int id, ActualizarFidelizadoCommand fidelizado, CancellationToken cancellationToken)
+        public async Task<IActionResult> Put(int id, ActualizarFidelizadoCommand fidelizado, CancellationToken cancellationToken)
         {
-            if (id != fidelizado.Id)
+            try
             {
-                return false;
-            }
+                if (id != fidelizado.Id)
+                {
+                    return NotFound("Fidelizado no existe");
+                }
 
-            return await _mediator.Send(fidelizado, cancellationToken);
+                return Ok(await _mediator.Send(fidelizado, cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras su actualizaba fidelizado con id - {fidelizado.Id}.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpPost]
         [Authtentication.Authorize]
-        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Create(AgregarFidelizadoCommand fidelizadoDto, CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(IActionResult), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Create(AgregarFidelizadoCommand fidelizadoDto, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(fidelizadoDto, cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(fidelizadoDto, cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras su agregraba fidelizado con número de cédula - {fidelizadoDto.Documento}.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpDelete("{id}")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Delete(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new EliminarFidelizadoCommand(id), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new EliminarFidelizadoCommand(id), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras su eliminaba fidelizado con id - {id}.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
     }
 }

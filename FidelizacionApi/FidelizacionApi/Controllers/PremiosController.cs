@@ -1,5 +1,6 @@
 ﻿using Aplicacion.Command.Premios;
 using Aplicacion.Command.Premios.Dtos;
+using Aplicacion.Exepciones;
 using Aplicacion.Query.Premios;
 using Aplicacion.Query.Premios.Dtos;
 using MediatR;
@@ -23,45 +24,93 @@ namespace FidelizacionApi.Controllers
 
         [HttpGet("{centroVentaId}")]
         [ProducesResponseType(typeof(IEnumerable<PremioDTO>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<PremioDTO>> GetPremios(int centroVentaId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetPremios(int centroVentaId, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerPremiosQuery(centroVentaId), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerPremiosQuery(centroVentaId), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenian los premios.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
 
         [HttpGet("{centroVentaId}/Vigentes")]
         [ProducesResponseType(typeof(IEnumerable<PremioDTO>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<PremioDTO>> GetPremiosVigentes(int centroVentaId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetPremiosVigentes(int centroVentaId, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerPremiosVigentesQuery(centroVentaId), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerPremiosVigentesQuery(centroVentaId), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenian los premios.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Create(AgregarPremioCommand agregarPremio, CancellationToken cancellationToken)
+        public async Task<IActionResult> Create(AgregarPremioCommand agregarPremio, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(agregarPremio, cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(agregarPremio, cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se agregaba un premio.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpPut]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Update(ActualizarPremioCommand actualizarPremio, CancellationToken cancellationToken)
+        public async Task<IActionResult> Update(ActualizarPremioCommand actualizarPremio, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(actualizarPremio, cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(actualizarPremio, cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se actualizaba un premio.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpDelete]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Delete(EliminarPremioCommand eliminarPremio, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete(EliminarPremioCommand eliminarPremio, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(eliminarPremio, cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(eliminarPremio, cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se eliminaba un premio.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpPost("Redimir")]
         [ProducesResponseType(typeof(RespuestaRedencionPremioDTO), (int)HttpStatusCode.OK)]
-        public async Task<RespuestaRedencionPremioDTO> Redimir(RedencionPremioCommand redimirPremio, CancellationToken cancellationToken)
+        public async Task<IActionResult> Redimir(RedencionPremioCommand redimirPremio, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(redimirPremio, cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(redimirPremio, cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se redimía un premio.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
     }
 }

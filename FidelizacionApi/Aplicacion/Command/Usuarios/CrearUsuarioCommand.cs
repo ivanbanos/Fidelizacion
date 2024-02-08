@@ -1,15 +1,20 @@
-﻿using Dominio.Entidades;
-using MediatR;
+﻿using MediatR;
 
 namespace Aplicacion.Command.Usuarios
 {
     public class CrearUsuarioCommand : IRequest<bool>
     {
-        public Usuario Usuario { get; }
+        public string NombreUsuario { get; }
+        public int Perfil { get; }
+        public int? CentroVentaId { get; }
 
-        public CrearUsuarioCommand(Usuario usuario)
+        public CrearUsuarioCommand(string nombreUsuario, 
+                        int perfil, 
+                        int? centroVentaId)
         {
-            Usuario = usuario;
+            NombreUsuario = nombreUsuario;
+            Perfil = perfil;
+            CentroVentaId = centroVentaId;
         }
     }
 }

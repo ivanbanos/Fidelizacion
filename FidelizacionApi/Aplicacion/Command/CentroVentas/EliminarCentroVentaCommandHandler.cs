@@ -1,8 +1,10 @@
-﻿using Datos.Common;
+﻿using Aplicacion.Exepciones;
+using Datos.Common;
 using Dominio.Common.Enum;
 using Dominio.Entidades;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace Aplicacion.Command.CentroVentas
 {
@@ -21,8 +23,8 @@ namespace Aplicacion.Command.CentroVentas
         {
             var centroVenta = await _repositorioGenerico.GetByIdAsync(request.Id);
 
-            if (centroVenta == null) 
-                return false;
+            if (centroVenta == null)
+                throw new ApiException() { ExceptionMessage = "Centro de venta no existe", StatusCode = HttpStatusCode.BadRequest };
 
             centroVenta.EstadoId = (int)EstadoEnum.Inactivo;
             await _repositorioGenerico.UpdateAsync(centroVenta);

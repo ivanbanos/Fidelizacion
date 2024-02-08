@@ -1,5 +1,4 @@
-﻿using Dominio.Entidades;
-using MediatR;
+﻿using MediatR;
 
 namespace Aplicacion.Command.Fidelizados
 {

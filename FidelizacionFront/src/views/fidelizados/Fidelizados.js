@@ -34,6 +34,7 @@ import DeleteFidelizado from 'src/services/fidelizados/DeleteFidelizado'
 import GetCiudades from 'src/services/configuraciones/GetCiudades'
 import GetCentroVentas from '../../services/centroVentas/GetCentroVentas'
 import GetCentroVentaPorCompania from '../../services/centroVentas/GetCentroVentaPorCompania'
+import Toast from '../notifications/toasts/Toasts'
 
 const AddFidelizadoModal = (props) => {
   const centroVenta = localStorage.getItem('idCentroVenta')
@@ -114,7 +115,7 @@ const AddFidelizadoModal = (props) => {
     }
     setValidated(true)
     if (form.checkValidity() === true) {
-      await AddFidelizado(
+      let resultado = await AddFidelizado(
         newDocumento,
         newTipoDocumento,
         newNombre,
@@ -131,7 +132,13 @@ const AddFidelizadoModal = (props) => {
       )
       props.GetFidelizados()
       setValidated(false)
-      setAddFidelizadoVisible(false)
+      if (resultado.status === 400 || resultado.status === 500) {
+        props.toast.current.showToast(resultado.response, 'danger')
+      }
+      if (resultado.status === 200) {
+        props.toast.current.showToast('Fidelizado agregado con exito', 'success')
+        setAddFidelizadoVisible(false)
+      }
     }
   }
 
@@ -180,8 +187,7 @@ const AddFidelizadoModal = (props) => {
               <CCol xs={9}>
                 <CFormInput
                   placeholder="Documento"
-                  type="text"
-                  id="email"
+                  type="number"
                   feedbackInvalid="Este campo es requerido"
                   onChange={handleDocumentoChange}
                   required
@@ -205,7 +211,7 @@ const AddFidelizadoModal = (props) => {
               <CCol xs={9}>
                 <CFormInput
                   placeholder="Porcentaje de Puntos"
-                  type="text"
+                  type="number"
                   feedbackInvalid="Este campo es requerido"
                   onChange={handlePorcentajePuntoChange}
                   required
@@ -217,7 +223,7 @@ const AddFidelizadoModal = (props) => {
               <CCol xs={9}>
                 <CFormInput
                   placeholder="Tel&eacute;fono"
-                  type="text"
+                  type="number"
                   onChange={handleTelefonoChange}
                 />
               </CCol>
@@ -227,7 +233,7 @@ const AddFidelizadoModal = (props) => {
               <CCol xs={9}>
                 <CFormInput
                   placeholder="Celular"
-                  type="text"
+                  type="number"
                   feedbackInvalid="Este campo es requerido"
                   onChange={handleCelularChange}
                   required
@@ -249,7 +255,7 @@ const AddFidelizadoModal = (props) => {
             <CRow className="mb-2">
               <CCol xs={3}>Estrato:</CCol>
               <CCol xs={9}>
-                <CFormInput placeholder="Estrato" type="text" onChange={handleEstratoChange} />
+                <CFormInput placeholder="Estrato" type="number" onChange={handleEstratoChange} />
               </CCol>
             </CRow>
             <CRow className="mb-2">
@@ -257,7 +263,7 @@ const AddFidelizadoModal = (props) => {
               <CCol xs={9}>
                 <CFormInput
                   placeholder="N&uacute;mero de Hijos"
-                  type="text"
+                  type="number"
                   onChange={handleNumeroHijosChange}
                 />
               </CCol>
@@ -439,33 +445,29 @@ const TaskFidelizado = (props) => {
       fidelizado.sexoId = newSexo
       fidelizado.ciudadId = newCiudad
       fidelizado.profesionId = newProfesion
-      await UpdateFidelizado(props.Fidelizado)
+      let resultado = await UpdateFidelizado(props.Fidelizado)
       props.GetFidelizados()
       setValidated(false)
-      setUpdateFidelizadoVisible(false)
+      if (resultado.status === 400 || resultado.status === 500) {
+        props.toast.current.showToast(resultado.response, 'danger')
+      }
+      if (resultado.status === 200) {
+        props.toast.current.showToast('Fidelizado actualizado con exito', 'success')
+        setUpdateFidelizadoVisible(false)
+      }
     }
   }
 
-  const updateFidelizado = async () => {
-    let fidelizado = props.Fidelizado
-    fidelizado.nombre = newNombre
-    fidelizado.porcentajePuntos = newPorcentajePunto
-    fidelizado.telefono = newTelefono
-    fidelizado.celular = newCelular
-    fidelizado.direccion = newDireccion
-    fidelizado.estrato = newEstrato
-    fidelizado.numero = newNumeroHijos
-    fidelizado.sexoId = newSexo
-    fidelizado.ciudadId = newCiudad
-    fidelizado.profesionId = newProfesion
-    await UpdateFidelizado(props.Fidelizado)
-    props.GetFidelizados()
-    setUpdateFidelizadoVisible(false)
-  }
   const deleteFidelizado = async () => {
-    await DeleteFidelizado(props.Fidelizado)
+    let resultado = await DeleteFidelizado(props.Fidelizado)
+    if (resultado.status === 400 || resultado.status === 500) {
+      props.toast.current.showToast(resultado.response, 'danger')
+    }
     props.GetFidelizados()
     setDeleteFidelizadoVisible(false)
+    if (resultado.status === 200) {
+      props.toast.current.showToast('Fidelizado eliminado con exito', 'success')
+    }
   }
 
   return (
@@ -515,7 +517,7 @@ const TaskFidelizado = (props) => {
                 <CFormInput
                   placeholder="Documento"
                   value={newDocumento}
-                  type="text"
+                  type="number"
                   id="documento"
                   feedbackInvalid="Este campo es requerido"
                   onChange={handleDocumentoChange}
@@ -542,7 +544,7 @@ const TaskFidelizado = (props) => {
                 <CFormInput
                   placeholder="Porcentaje de Puntos"
                   value={newPorcentajePunto}
-                  type="text"
+                  type="number"
                   feedbackInvalid="Este campo es requerido"
                   onChange={handlePorcentajePuntoChange}
                   required
@@ -555,7 +557,7 @@ const TaskFidelizado = (props) => {
                 <CFormInput
                   placeholder="Tel&eacute;fono"
                   value={newTelefono === '0000000000' ? '' : newTelefono}
-                  type="text"
+                  type="number"
                   onChange={handleTelefonoChange}
                 />
               </CCol>
@@ -566,7 +568,7 @@ const TaskFidelizado = (props) => {
                 <CFormInput
                   placeholder="Celular"
                   value={newCelular}
-                  type="text"
+                  type="number"
                   feedbackInvalid="Este campo es requerido"
                   onChange={handleCelularChange}
                   required
@@ -592,7 +594,7 @@ const TaskFidelizado = (props) => {
                 <CFormInput
                   placeholder="Estrato"
                   value={newEstrato === 0 ? '' : newEstrato}
-                  type="text"
+                  type="number"
                   onChange={handleEstratoChange}
                 />
               </CCol>
@@ -603,7 +605,7 @@ const TaskFidelizado = (props) => {
                 <CFormInput
                   placeholder="N&uacute;mero de Hijos"
                   value={newNumeroHijos === 0 ? '' : newNumeroHijos}
-                  type="text"
+                  type="number"
                   onChange={handleNumeroHijosChange}
                 />
               </CCol>
@@ -711,7 +713,8 @@ const TaskFidelizado = (props) => {
 
 const Fidelizados = () => {
   let navigate = useNavigate()
-  const perfil = localStorage.getItem('perfil')
+  const perfil = localStorage.getItem('perfil') !== null ? localStorage.getItem('perfil') : 'null'
+  const [validated, setValidated] = useState(false)
   const [Fidelizados, setFidelizados] = useState([])
   const [ciudades, setCiudades] = useState([])
   const [CentroVentas, setCentroVentas] = useState([])
@@ -723,32 +726,52 @@ const Fidelizados = () => {
   }
 
   const fetchFidelizados = async () => {
-    let fidelizados = []
+    let resultado = []
     if (perfil === '1') {
-      fidelizados = await GetFidelizados()
+      resultado = await GetFidelizados()
     } else {
-      fidelizados = await GetFidelizadosPorCentroVenta()
+      resultado = await GetFidelizadosPorCentroVenta()
     }
-    setFidelizados(fidelizados)
+    if (resultado.status === 401) {
+      navigate('/Login', { replace: true })
+    }
+    if (resultado.status === 400 || resultado.status === 500) {
+      toastRef.current.showToast(resultado.response, 'danger')
+    }
+    if (resultado.status === 200) {
+      setFidelizados(resultado.response)
+    }
   }
 
   const fetchCiudades = async () => {
-    let ciudades = await GetCiudades()
-    setCiudades(ciudades)
+    let ciudadesResultado = await GetCiudades()
+    if (ciudadesResultado.status === 401) {
+      navigate('/Login', { replace: true })
+    }
+    if (ciudadesResultado.status === 400 || ciudadesResultado.status === 500) {
+      toastRef.current.showToast(ciudadesResultado.response, 'danger')
+    }
+    if (ciudadesResultado.status === 200) {
+      setCiudades(ciudadesResultado.response)
+    }
   }
 
   const fetchCentroVentas = async () => {
-    let CentroVentas = []
+    let centroVentasResultado = []
     if (perfil === '1') {
-      CentroVentas = await GetCentroVentas()
+      centroVentasResultado = await GetCentroVentas()
     } else {
-      CentroVentas = await GetCentroVentaPorCompania()
+      centroVentasResultado = await GetCentroVentaPorCompania()
     }
-    if (CentroVentas === 'fail') {
+    if (centroVentasResultado.status === 401) {
       navigate('/Login', { replace: true })
     }
-
-    setCentroVentas(CentroVentas)
+    if (centroVentasResultado.status === 400 || centroVentasResultado.status === 500) {
+      toastRef.current.showToast(centroVentasResultado.response, 'danger')
+    }
+    if (centroVentasResultado.status === 200) {
+      setCentroVentas(centroVentasResultado.response)
+    }
   }
 
   useEffect(() => {
@@ -758,25 +781,41 @@ const Fidelizados = () => {
   }, [])
 
   const handleSubmitFiltro = async (event) => {
-    let fidelizados = []
-    if (perfil === '1') {
-      fidelizados = await GetFidelizadosConFiltro(filtro)
-    } else {
-      fidelizados = await GetFidelizadosPorCentroVentaConFiltro(filtro)
+    const form = event.currentTarget
+    if (form.checkValidity() === false) {
+      event.preventDefault()
+      event.stopPropagation()
+      setValidated(true)
     }
-    setFidelizados(fidelizados)
+    let resultado = []
+    if (perfil === '1') {
+      resultado = await GetFidelizadosConFiltro(filtro)
+    } else {
+      resultado = await GetFidelizadosPorCentroVentaConFiltro(filtro)
+    }
+    setValidated(false)
+    if (resultado.status === 400 || resultado.status === 500) {
+      toastRef.current.showToast(resultado.response, 'danger')
+    }
+    if (resultado.status === 200) {
+      setFidelizados(resultado.response)
+    }
     event.preventDefault()
   }
 
   return (
     <>
+      <Toast ref={toastRef}></Toast>
       <h1>Fidelizados</h1>
-
       <CRow>
         <CCol xs={12} className="px-0">
           <CCard>
             <CCardBody>
-              <CForm className="row mt-1 needs-validation" onSubmit={handleSubmitFiltro}>
+              <CForm
+                className="row mt-1 needs-validation"
+                validated={validated}
+                onSubmit={handleSubmitFiltro}
+              >
                 <CRow className="mb-2">
                   <CCol xs={9}>
                     <CInputGroup className="mb-3">
@@ -785,7 +824,9 @@ const Fidelizados = () => {
                         placeholder="Filtro"
                         type="text"
                         id="filtro"
+                        feedbackInvalid="Este campo es requerido"
                         onChange={handleFiltroChange}
+                        required
                       />
                     </CInputGroup>
                   </CCol>
@@ -801,8 +842,8 @@ const Fidelizados = () => {
         </CCol>
       </CRow>
       <CRow className="mt-2">
-        <CTable>
-          <CTableHead>
+        <CTable align="middle" bordered small hover>
+          <CTableHead align="middle">
             <CTableRow>
               <CTableHeaderCell scope="col">Nombre</CTableHeaderCell>
               <CTableHeaderCell scope="col">Puntos</CTableHeaderCell>
@@ -812,11 +853,12 @@ const Fidelizados = () => {
                   ciudades={ciudades}
                   Perfil={perfil}
                   CentroVentas={CentroVentas}
+                  toast={toastRef}
                 />
               </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
-          <CTableBody>
+          <CTableBody align="middle">
             {Fidelizados.map((fidelizado) => (
               <CTableRow key={fidelizado.id}>
                 <CTableHeaderCell>{fidelizado.nombre}</CTableHeaderCell>
@@ -828,6 +870,7 @@ const Fidelizados = () => {
                     Fidelizado={fidelizado}
                     Perfil={perfil}
                     CentroVentas={CentroVentas}
+                    toast={toastRef}
                   />
                 </CTableHeaderCell>
               </CTableRow>
