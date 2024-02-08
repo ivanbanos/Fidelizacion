@@ -7,13 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Query\Premios\ObtenerPremiosQueryHandler.cs~RF7e4ba250.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-    <PackageReference Include="MediatR" Version="11.0.0" />
+    <PackageReference Include="MediatR" Version="12.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Datos\Datos.csproj" />
     <ProjectReference Include="..\Dominio\Dominio.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Command\Fidelizados\Dtos\" />
   </ItemGroup>
 
 </Project>

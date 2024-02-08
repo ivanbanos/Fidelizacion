@@ -1,4 +1,5 @@
-﻿using Dominio.Entidades;
+﻿using Dominio.Dtos;
+using Dominio.Entidades;
 using Microsoft.EntityFrameworkCore;
 
 namespace Datos
@@ -24,7 +25,10 @@ namespace Datos
         public DbSet<Usuario> Usuario { get; set; }
         public DbSet<Punto> Punto { get; set; }
         public DbSet<Perfil> Perfil { get; set; }
-
+        public DbSet<Redencion> Redencion { get; set; }
+        #region StroredProcedures
+        public DbSet<FidelizadoDto> ObtenerFidelizados { get; set; }
+        #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Compania>()
@@ -53,6 +57,12 @@ namespace Datos
                     .HasOne(u => u.Perfil)
                     .WithMany(p => p.Usuarios)
                     .HasForeignKey(u => u.PerfilId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Redencion>()
+                    .HasOne(r => r.Premio)
+                    .WithMany(p => p.Redenciones)
+                    .HasForeignKey(r => r.PremioId)
                     .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<TipoVencimiento>().HasData(new TipoVencimiento[]
@@ -1286,6 +1296,7 @@ namespace Datos
                 }
             });
         }
+
 
     }
 }

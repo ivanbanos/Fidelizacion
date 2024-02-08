@@ -5,6 +5,7 @@
         public Compania()
         {
             CentroVentas = new List<CentroVenta>();
+            Premios = new List<Premio>();
         }
         public int? Id { get; set; }
         public string Nombre { get; set; }
@@ -14,5 +15,6 @@
         public int EstadoId { get; set; }
         public virtual Estado? Estado { get; set; }
         public virtual IEnumerable<CentroVenta>? CentroVentas { get; set; }
+        public virtual IEnumerable<Premio> Premios { get; set; }
     }
 }

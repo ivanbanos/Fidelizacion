@@ -1,7 +1,9 @@
 import { React, useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import GetFidelizados from '../../services/fidelizados/GetFidelizados'
+import GetFidelizadosConFiltro from '../../services/fidelizados/GetFidelizadosConFiltro'
 import GetFidelizadosPorCentroVenta from '../../services/fidelizados/GetFidelizadosPorCentroVenta'
+import GetFidelizadosPorCentroVentaConFiltro from '../../services/fidelizados/GetFidelizadosPorCentroVentaConFiltro'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilPencil, cilX } from '@coreui/icons'
 import {
@@ -20,6 +22,11 @@ import {
   CModalHeader,
   CModalTitle,
   CFormSelect,
+  CForm,
+  CCard,
+  CCardBody,
+  CInputGroup,
+  CInputGroupText,
 } from '@coreui/react'
 import AddFidelizado from 'src/services/fidelizados/AddFidelizado'
 import UpdateFidelizado from 'src/services/fidelizados/UpdateFidelizado'
@@ -30,6 +37,7 @@ import GetCentroVentaPorCompania from '../../services/centroVentas/GetCentroVent
 
 const AddFidelizadoModal = (props) => {
   const centroVenta = localStorage.getItem('idCentroVenta')
+  const [validated, setValidated] = useState(false)
   const [addFidelizadoVisible, setAddFidelizadoVisible] = useState(false)
   const [inputCentroVentaVisible, setCentroVentaVisible] = useState(
     props.Perfil === '1' || props.Perfil === '2',
@@ -97,24 +105,34 @@ const AddFidelizadoModal = (props) => {
   const handleCentroVentaChange = (event) => {
     setNewCentroVentaChange(event.target.value)
   }
-  const addFidelizado = async () => {
-    await AddFidelizado(
-      newDocumento,
-      newTipoDocumento,
-      newNombre,
-      newPorcentajePunto,
-      newCentroVenta,
-      newTelefono,
-      newCelular,
-      newDireccion,
-      newEstrato,
-      newNumeroHijos,
-      newSexo,
-      newCiudad,
-      newProfesion,
-    )
-    props.GetFidelizados()
-    setAddFidelizadoVisible(false)
+
+  const handleSubmit = async (event) => {
+    const form = event.currentTarget
+    if (form.checkValidity() === false) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    setValidated(true)
+    if (form.checkValidity() === true) {
+      await AddFidelizado(
+        newDocumento,
+        newTipoDocumento,
+        newNombre,
+        newPorcentajePunto,
+        newCentroVenta,
+        newTelefono,
+        newCelular,
+        newDireccion,
+        newEstrato,
+        newNumeroHijos,
+        newSexo,
+        newCiudad,
+        newProfesion,
+      )
+      props.GetFidelizados()
+      setValidated(false)
+      setAddFidelizadoVisible(false)
+    }
   }
 
   return (
@@ -131,133 +149,206 @@ const AddFidelizadoModal = (props) => {
           <CModalTitle>Agregar Fidelizado</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CRow className="mb-2">
-            <CCol xs={3}>Tipo documento*:</CCol>
-            <CCol xs={9}>
-              <CFormSelect aria-label="Default select example" onChange={handleTipoDocumentoChange}>
-                <option>Selecione un opcion</option>
-                {tipoDocumento.map((tipoDocumento) => (
-                  <option key={tipoDocumento.value} value={tipoDocumento.value}>
-                    {tipoDocumento.name}
-                  </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Documento*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Documento" onChange={handleDocumentoChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Nombre*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Nombre" onChange={handleNombreChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Porcentaje de Puntos*:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                placeholder="Porcentaje de Puntos"
-                onChange={handlePorcentajePuntoChange}
-              />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Tel&eacute;fono:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Tel&eacute;fono" onChange={handleTelefonoChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Celular*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Celular" onChange={handleCelularChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Direcci&oacute;n*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Direcci&oacute;n" onChange={handleDireccionChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Estrato:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Estrato" onChange={handleEstratoChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>N&uacute;mero de Hijos:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="N&uacute;mero de Hijos" onChange={handleNumeroHijosChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Sexo*:</CCol>
-            <CCol xs={9}>
-              <CFormSelect aria-label="Default select example" onChange={handleSexoChange}>
-                <option>Selecione un opcion</option>
-                {sexo.map((sexo) => (
-                  <option key={sexo.value} value={sexo.value}>
-                    {sexo.name}
-                  </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Ciudad*:</CCol>
-            <CCol xs={9}>
-              <CFormSelect aria-label="Default select example" onChange={handleCiudadChange}>
-                <option>Selecione un opcion</option>
-                {props.ciudades.map((ciudad) => (
-                  <option key={ciudad.id} value={ciudad.id}>
-                    {ciudad.nombre}
-                  </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Profesi&oacute;n:</CCol>
-            <CCol xs={9}>
-              <CFormSelect aria-label="Default select example" onChange={handleProfesionChange}>
-                <option>Selecione un opcion</option>
-                {profesion.map((profesion) => (
-                  <option key={profesion.value} value={profesion.value}>
-                    {profesion.name}
-                  </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-          </CRow>
-          {inputCentroVentaVisible && (
+          <CForm
+            className="row g-3 needs-validation"
+            noValidate
+            validated={validated}
+            onSubmit={handleSubmit}
+          >
             <CRow className="mb-2">
-              <CCol xs={3}>Centro de Venta*:</CCol>
+              <CCol xs={3}>Tipo documento*:</CCol>
               <CCol xs={9}>
-                <CFormSelect aria-label="Default select example" onChange={handleCentroVentaChange}>
-                  <option>Selecione un opcion</option>
-                  {props.CentroVentas.map((centroVenta) => (
-                    <option key={centroVenta.id} value={centroVenta.id}>
-                      {centroVenta.nombre}
+                <CFormSelect
+                  aria-label="Tipo de documento"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleTipoDocumentoChange}
+                  required
+                >
+                  <option selected="" value="">
+                    Seleccione una opci&oacute;n
+                  </option>
+                  {tipoDocumento.map((tipoDocumento) => (
+                    <option key={tipoDocumento.value} value={tipoDocumento.value}>
+                      {tipoDocumento.name}
                     </option>
                   ))}
                 </CFormSelect>
               </CCol>
             </CRow>
-          )}
+            <CRow className="mb-2">
+              <CCol xs={3}>Documento*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Documento"
+                  type="text"
+                  id="email"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleDocumentoChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Nombre*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Nombre"
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleNombreChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Porcentaje de Puntos*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Porcentaje de Puntos"
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handlePorcentajePuntoChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Tel&eacute;fono:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Tel&eacute;fono"
+                  type="text"
+                  onChange={handleTelefonoChange}
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Celular*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Celular"
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleCelularChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Direcci&oacute;n*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Direcci&oacute;n"
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleDireccionChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Estrato:</CCol>
+              <CCol xs={9}>
+                <CFormInput placeholder="Estrato" type="text" onChange={handleEstratoChange} />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>N&uacute;mero de Hijos:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="N&uacute;mero de Hijos"
+                  type="text"
+                  onChange={handleNumeroHijosChange}
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Sexo*:</CCol>
+              <CCol xs={9}>
+                <CFormSelect
+                  aria-label="Sexo"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleSexoChange}
+                  required
+                >
+                  <option selected="" value="">
+                    Seleccione una opci&oacute;n
+                  </option>
+                  {sexo.map((sexo) => (
+                    <option key={sexo.value} value={sexo.value}>
+                      {sexo.name}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Ciudad*:</CCol>
+              <CCol xs={9}>
+                <CFormSelect
+                  aria-label="Ciudad"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleCiudadChange}
+                  required
+                >
+                  <option selected="" value="">
+                    Seleccione una opci&oacute;n
+                  </option>
+                  {props.ciudades.map((ciudad) => (
+                    <option key={ciudad.id} value={ciudad.id}>
+                      {ciudad.nombre}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Profesi&oacute;n:</CCol>
+              <CCol xs={9}>
+                <CFormSelect aria-label="Profesi&ocute;n" onChange={handleProfesionChange}>
+                  <option selected="" value="">
+                    Seleccione una opci&oacute;n
+                  </option>
+                  {profesion.map((profesion) => (
+                    <option key={profesion.value} value={profesion.value}>
+                      {profesion.name}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+            </CRow>
+            {inputCentroVentaVisible && (
+              <CRow className="mb-2">
+                <CCol xs={3}>Centro de Venta*:</CCol>
+                <CCol xs={9}>
+                  <CFormSelect
+                    aria-label="Default select example"
+                    feedbackInvalid="Este campo es requerido"
+                    onChange={handleCentroVentaChange}
+                    required
+                  >
+                    <option selected="" value="">
+                      Seleccione una opci&oacute;n
+                    </option>
+                    {props.CentroVentas.map((centroVenta) => (
+                      <option key={centroVenta.id} value={centroVenta.id}>
+                        {centroVenta.nombre}
+                      </option>
+                    ))}
+                  </CFormSelect>
+                </CCol>
+              </CRow>
+            )}
+            <CModalFooter>
+              <CButton color="secondary" onClick={() => setAddFidelizadoVisible(false)}>
+                Cerrar
+              </CButton>
+              <CButton color="primary" type="submit">
+                Agregar
+              </CButton>
+            </CModalFooter>
+          </CForm>
         </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setAddFidelizadoVisible(false)}>
-            Cerrar
-          </CButton>
-          <CButton color="primary" onClick={addFidelizado}>
-            Agregar
-          </CButton>
-        </CModalFooter>
       </CModal>
     </>
   )
@@ -266,28 +357,21 @@ const AddFidelizadoModal = (props) => {
 const TaskFidelizado = (props) => {
   const [updateFidelizadoVisible, setUpdateFidelizadoVisible] = useState(false)
   const [deleteFidelizadoVisible, setDeleteFidelizadoVisible] = useState(false)
+  const [validated, setValidated] = useState(false)
   const [newTipoDocumento, setNewTipoDocumento] = useState(props.Fidelizado.tipoDocumentoId)
   const [newDocumento, setNewDocumento] = useState(props.Fidelizado.documento)
   const [newNombre, setNewNombre] = useState(props.Fidelizado.nombre)
   const [newPorcentajePunto, setNewPorcentajePuntoChange] = useState(
     props.Fidelizado.porcentajePuntos,
   )
-  const [newTelefono, setNewTelefonoChange] = useState(
-    props.Fidelizado.informacionAdicional.telefono,
-  )
-  const [newCelular, setNewCelularChange] = useState(props.Fidelizado.informacionAdicional.celular)
-  const [newDireccion, setNewDireccionChange] = useState(
-    props.Fidelizado.informacionAdicional.direccion,
-  )
-  const [newEstrato, setNewEstratoChange] = useState(props.Fidelizado.informacionAdicional.estrato)
-  const [newNumeroHijos, setNewNumeroHijosChange] = useState(
-    props.Fidelizado.informacionAdicional.numeroHijos,
-  )
-  const [newSexo, setNewSexoChange] = useState(props.Fidelizado.informacionAdicional.sexoId)
-  const [newCiudad, setNewCiudad] = useState(props.Fidelizado.informacionAdicional.ciudadId)
-  const [newProfesion, setNewProfesion] = useState(
-    props.Fidelizado.informacionAdicional.profesionId,
-  )
+  const [newTelefono, setNewTelefonoChange] = useState(props.Fidelizado.telefono)
+  const [newCelular, setNewCelularChange] = useState(props.Fidelizado.celular)
+  const [newDireccion, setNewDireccionChange] = useState(props.Fidelizado.direccion)
+  const [newEstrato, setNewEstratoChange] = useState(props.Fidelizado.estrato)
+  const [newNumeroHijos, setNewNumeroHijosChange] = useState(props.Fidelizado.numeroHijos)
+  const [newSexo, setNewSexoChange] = useState(props.Fidelizado.sexoId)
+  const [newCiudad, setNewCiudad] = useState(props.Fidelizado.ciudadId)
+  const [newProfesion, setNewProfesion] = useState(props.Fidelizado.profesionId)
   let tipoDocumento = []
   tipoDocumento.push({ value: 1, name: 'Cedula' })
   tipoDocumento.push({ value: 2, name: 'Pasaporte' })
@@ -336,20 +420,44 @@ const TaskFidelizado = (props) => {
     setNewProfesion(event.target.value)
   }
 
+  const handleSubmit = async (event) => {
+    const form = event.currentTarget
+    if (form.checkValidity() === false) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    setValidated(true)
+    if (form.checkValidity() === true) {
+      let fidelizado = props.Fidelizado
+      fidelizado.nombre = newNombre
+      fidelizado.porcentajePuntos = newPorcentajePunto
+      fidelizado.telefono = newTelefono
+      fidelizado.celular = newCelular
+      fidelizado.direccion = newDireccion
+      fidelizado.estrato = newEstrato
+      fidelizado.numero = newNumeroHijos
+      fidelizado.sexoId = newSexo
+      fidelizado.ciudadId = newCiudad
+      fidelizado.profesionId = newProfesion
+      await UpdateFidelizado(props.Fidelizado)
+      props.GetFidelizados()
+      setValidated(false)
+      setUpdateFidelizadoVisible(false)
+    }
+  }
+
   const updateFidelizado = async () => {
     let fidelizado = props.Fidelizado
-    fidelizado.tipoDocumento = newTipoDocumento
-    fidelizado.documento = newDocumento
     fidelizado.nombre = newNombre
-    fidelizado.procentaje = newPorcentajePunto
-    fidelizado.informacionAdicional.telefono = newTelefono
-    fidelizado.informacionAdicional.celular = newCelular
-    fidelizado.informacionAdicional.direccion = newDireccion
-    fidelizado.informacionAdicional.estrato = newEstrato
-    fidelizado.informacionAdicional.numero = newNumeroHijos
-    fidelizado.informacionAdicional.sexoId = newSexo
-    fidelizado.informacionAdicional.ciudadId = newCiudad
-    fidelizado.informacionAdicional.profesionId = newProfesion
+    fidelizado.porcentajePuntos = newPorcentajePunto
+    fidelizado.telefono = newTelefono
+    fidelizado.celular = newCelular
+    fidelizado.direccion = newDireccion
+    fidelizado.estrato = newEstrato
+    fidelizado.numero = newNumeroHijos
+    fidelizado.sexoId = newSexo
+    fidelizado.ciudadId = newCiudad
+    fidelizado.profesionId = newProfesion
     await UpdateFidelizado(props.Fidelizado)
     props.GetFidelizados()
     setUpdateFidelizadoVisible(false)
@@ -371,158 +479,206 @@ const TaskFidelizado = (props) => {
         onClose={() => setUpdateFidelizadoVisible(false)}
       >
         <CModalHeader>
-          <CModalTitle>Actualizar Compa&ntilde;ia</CModalTitle>
+          <CModalTitle>Actualizar Fidelizado</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CRow className="mb-2">
-            <CCol xs={3}>Tipo documento*:</CCol>
-            <CCol xs={9}>
-              <CFormSelect
-                value={newTipoDocumento}
-                aria-label="Default select example"
-                onChange={handleTipoDocumentoChange}
-              >
-                <option>Selecione un opcion</option>
-                {tipoDocumento.map((tipoDocumento) => (
-                  <option key={tipoDocumento.value} value={tipoDocumento.value}>
-                    {tipoDocumento.name}
+          <CForm
+            className="row g-3 needs-validation"
+            noValidate
+            validated={validated}
+            onSubmit={handleSubmit}
+          >
+            <CRow className="mb-2">
+              <CCol xs={3}>Tipo documento*:</CCol>
+              <CCol xs={9}>
+                <CFormSelect
+                  aria-label="Tipo de documento"
+                  value={newTipoDocumento}
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleTipoDocumentoChange}
+                  disabled
+                >
+                  <option selected="" value="">
+                    Seleccione una opci&oacute;n
                   </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Documento*:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                value={newDocumento}
-                placeholder="Documento"
-                onChange={handleDocumentoChange}
-              />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Nombre*:</CCol>
-            <CCol xs={9}>
-              <CFormInput value={newNombre} placeholder="Nombre" onChange={handleNombreChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Porcentaje de Puntos*:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                value={newPorcentajePunto}
-                placeholder="Porcentaje de Puntos"
-                onChange={handlePorcentajePuntoChange}
-              />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Tel&eacute;fono:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                value={newTelefono === '0000000000' ? '' : newTelefono}
-                placeholder="Tel&eacute;fono"
-                onChange={handleTelefonoChange}
-              />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Celular*:</CCol>
-            <CCol xs={9}>
-              <CFormInput value={newCelular} placeholder="Celular" onChange={handleCelularChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Direcci&oacute;n*:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                value={newDireccion}
-                placeholder="Direcci&oacute;n"
-                onChange={handleDireccionChange}
-              />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Estrato:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                value={newEstrato === 0 ? '' : newEstrato}
-                placeholder="Estrato"
-                onChange={handleEstratoChange}
-              />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>N&uacute;mero de Hijos:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                value={newNumeroHijos === 0 ? '' : newNumeroHijos}
-                placeholder="N&uacute;mero de Hijos"
-                onChange={handleNumeroHijosChange}
-              />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Sexo*:</CCol>
-            <CCol xs={9}>
-              <CFormSelect
-                value={newSexo}
-                aria-label="Default select example"
-                onChange={handleSexoChange}
-              >
-                <option>Selecione un opcion</option>
-                {sexo.map((sexo) => (
-                  <option key={sexo.value} value={sexo.value}>
-                    {sexo.name}
+                  {tipoDocumento.map((tipoDocumento) => (
+                    <option key={tipoDocumento.value} value={tipoDocumento.value}>
+                      {tipoDocumento.name}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Documento*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Documento"
+                  value={newDocumento}
+                  type="text"
+                  id="documento"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleDocumentoChange}
+                  disabled
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Nombre*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Nombre"
+                  value={newNombre}
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleNombreChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Porcentaje de Puntos*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Porcentaje de Puntos"
+                  value={newPorcentajePunto}
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handlePorcentajePuntoChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Tel&eacute;fono:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Tel&eacute;fono"
+                  value={newTelefono === '0000000000' ? '' : newTelefono}
+                  type="text"
+                  onChange={handleTelefonoChange}
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Celular*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Celular"
+                  value={newCelular}
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleCelularChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Direcci&oacute;n*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Direcci&oacute;n"
+                  value={newDireccion}
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleDireccionChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Estrato:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Estrato"
+                  value={newEstrato === 0 ? '' : newEstrato}
+                  type="text"
+                  onChange={handleEstratoChange}
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>N&uacute;mero de Hijos:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="N&uacute;mero de Hijos"
+                  value={newNumeroHijos === 0 ? '' : newNumeroHijos}
+                  type="text"
+                  onChange={handleNumeroHijosChange}
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Sexo*:</CCol>
+              <CCol xs={9}>
+                <CFormSelect
+                  aria-label="Sexo"
+                  value={newSexo}
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleSexoChange}
+                  required
+                >
+                  <option selected="" value="">
+                    Seleccione una opci&oacute;n
                   </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Ciudad*:</CCol>
-            <CCol xs={9}>
-              <CFormSelect
-                value={newCiudad}
-                aria-label="Default select example"
-                onChange={handleCiudadChange}
-              >
-                <option>Selecione un opcion</option>
-                {props.ciudades.map((ciudad) => (
-                  <option key={ciudad.id} value={ciudad.id}>
-                    {ciudad.nombre}
+                  {sexo.map((sexo) => (
+                    <option key={sexo.value} value={sexo.value}>
+                      {sexo.name}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Ciudad*:</CCol>
+              <CCol xs={9}>
+                <CFormSelect
+                  aria-label="Ciudad"
+                  value={newCiudad}
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleCiudadChange}
+                  required
+                >
+                  <option selected="" value="">
+                    Seleccione una opci&oacute;n
                   </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Profesi&oacute;n:</CCol>
-            <CCol xs={9}>
-              <CFormSelect
-                value={newProfesion}
-                aria-label="Default select example"
-                onChange={handleProfesionChange}
-              >
-                <option>Selecione un opcion</option>
-                {profesion.map((profesion) => (
-                  <option key={profesion.value} value={profesion.value}>
-                    {profesion.name}
+                  {props.ciudades.map((ciudad) => (
+                    <option key={ciudad.id} value={ciudad.id}>
+                      {ciudad.nombre}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Profesi&oacute;n:</CCol>
+              <CCol xs={9}>
+                <CFormSelect
+                  aria-label="Profesi&ocute;n"
+                  value={newProfesion}
+                  onChange={handleProfesionChange}
+                >
+                  <option selected="" value="">
+                    Seleccione una opci&oacute;n
                   </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-          </CRow>
+                  {profesion.map((profesion) => (
+                    <option key={profesion.value} value={profesion.value}>
+                      {profesion.name}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+            </CRow>
+            <CModalFooter>
+              <CButton color="secondary" onClick={() => setUpdateFidelizadoVisible(false)}>
+                Cerrar
+              </CButton>
+              <CButton color="primary" type="submit">
+                Actualizar
+              </CButton>
+            </CModalFooter>
+          </CForm>
         </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setUpdateFidelizadoVisible(false)}>
-            Cerrar
-          </CButton>
-          <CButton color="primary" onClick={updateFidelizado}>
-            Actualizar
-          </CButton>
-        </CModalFooter>
       </CModal>
       <CButton style={{ margin: '2pt' }} onClick={() => setDeleteFidelizadoVisible(true)}>
         <CIcon icon={cilX} size="sm" />
@@ -533,7 +689,7 @@ const TaskFidelizado = (props) => {
         onClose={() => setDeleteFidelizadoVisible(false)}
       >
         <CModalHeader>
-          <CModalTitle>Eliminar Compa&ntilde;ia</CModalTitle>
+          <CModalTitle>Eliminar Fidelizado</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CRow>
@@ -559,7 +715,12 @@ const Fidelizados = () => {
   const [Fidelizados, setFidelizados] = useState([])
   const [ciudades, setCiudades] = useState([])
   const [CentroVentas, setCentroVentas] = useState([])
+  const [filtro, setFiltro] = useState()
   const toastRef = useRef()
+
+  const handleFiltroChange = (event) => {
+    setFiltro(event.target.value)
+  }
 
   const fetchFidelizados = async () => {
     let fidelizados = []
@@ -568,11 +729,7 @@ const Fidelizados = () => {
     } else {
       fidelizados = await GetFidelizadosPorCentroVenta()
     }
-    if (fidelizados === 'fail') {
-      navigate('/Login', { replace: true })
-    } else {
-      setFidelizados(fidelizados)
-    }
+    setFidelizados(fidelizados)
   }
 
   const fetchCiudades = async () => {
@@ -600,22 +757,63 @@ const Fidelizados = () => {
     fetchCentroVentas()
   }, [])
 
+  const handleSubmitFiltro = async (event) => {
+    let fidelizados = []
+    if (perfil === '1') {
+      fidelizados = await GetFidelizadosConFiltro(filtro)
+    } else {
+      fidelizados = await GetFidelizadosPorCentroVentaConFiltro(filtro)
+    }
+    setFidelizados(fidelizados)
+    event.preventDefault()
+  }
+
   return (
     <>
       <h1>Fidelizados</h1>
-      <AddFidelizadoModal
-        GetFidelizados={fetchFidelizados}
-        ciudades={ciudades}
-        Perfil={perfil}
-        CentroVentas={CentroVentas}
-      />
+
       <CRow>
+        <CCol xs={12} className="px-0">
+          <CCard>
+            <CCardBody>
+              <CForm className="row mt-1 needs-validation" onSubmit={handleSubmitFiltro}>
+                <CRow className="mb-2">
+                  <CCol xs={9}>
+                    <CInputGroup className="mb-3">
+                      <CInputGroupText id="basic-addon1">Filto:</CInputGroupText>
+                      <CFormInput
+                        placeholder="Filtro"
+                        type="text"
+                        id="filtro"
+                        onChange={handleFiltroChange}
+                      />
+                    </CInputGroup>
+                  </CCol>
+                  <CCol xs={3}>
+                    <CButton className="me-3" color="primary" type="submit">
+                      Buscar
+                    </CButton>
+                  </CCol>
+                </CRow>
+              </CForm>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+      <CRow className="mt-2">
         <CTable>
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell scope="col">Nombre</CTableHeaderCell>
               <CTableHeaderCell scope="col">Puntos</CTableHeaderCell>
-              <CTableHeaderCell scope="col"></CTableHeaderCell>
+              <CTableHeaderCell scope="col">
+                <AddFidelizadoModal
+                  GetFidelizados={fetchFidelizados}
+                  ciudades={ciudades}
+                  Perfil={perfil}
+                  CentroVentas={CentroVentas}
+                />
+              </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>

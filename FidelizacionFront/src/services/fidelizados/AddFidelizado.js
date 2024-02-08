@@ -19,25 +19,22 @@ const AddFidelizado = async (
     const token = localStorage.getItem('token')
     const idUsuario = localStorage.getItem('idUsuario')
     const body = {
-      fidelizado: {
-        documento: documento,
-        tipoDocumentoId: tipoDocumentoId,
-        nombre: nombre,
-        porcentajePuntos: porcentajePuntos,
-        centroVentaId: centroVentaId,
-        informacionAdicional: {
-          telefono: telefono,
-          celular: celular,
-          direccion: direccion,
-          estrato: estrato,
-          numeroHijos: numeroHijos,
-          sexoId: sexo,
-          ciudadId: ciudad,
-          profesionId: profesion === 0 ? null : profesion,
-        },
-      },
+      documento: documento,
+      tipoDocumentoId: tipoDocumentoId,
+      nombre: nombre,
+      porcentajePuntos: porcentajePuntos,
+      centroVentaId: centroVentaId,
+      telefono: telefono,
+      celular: celular,
+      direccion: direccion,
+      estrato: estrato,
+      numeroHijos: numeroHijos,
+      sexoId: sexo,
+      ciudadId: ciudad,
+      profesionId: profesion === 0 ? null : profesion,
       usuario: idUsuario,
     }
+    console.log(body)
     const response = await fetch(configData.SERVER_URL + '/api/Fidelizados', {
       method: 'POST',
       mode: 'cors',

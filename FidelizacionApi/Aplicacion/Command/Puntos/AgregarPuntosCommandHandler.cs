@@ -21,18 +21,20 @@ namespace Aplicacion.Command.Puntos
 
         public async Task<bool> Handle(AgregarPuntosCommand request, CancellationToken cancellationToken)
         {
-            var centroVentas = await _repositorioCentroVenta.GetAsync(f => f.Nit == request.NitCentroVenta);
+            var centroVentas = await _repositorioCentroVenta.GetAsync(f => f.Nit.Equals(request.NitCentroVenta));
 
             if (!centroVentas.Any())
                 return false;
 
             var centroVenta = centroVentas.FirstOrDefault();
 
-            var fidelizados = await _repositorioFidelizado.GetAsync(f => f.Documento == request.DocumentoFidelizado);
+            var fidelizados = await _repositorioFidelizado
+                                       .GetAsync(f => f.Documento.Equals(request.DocumentoFidelizado)
+                                                        && f.CentroVentaId == centroVenta.Id);
             if(!fidelizados.Any())
                 return false;
 
-            var fidelizado = fidelizados.FirstOrDefault();
+            var fidelizado = fidelizados.FirstOrDefault(x=>x.CentroVentaId == centroVenta.Id);
 
             var facturas = await _repositorioGenerico.GetAsync(fc => fc.Factura == request.Factura && fc.CentroVentaId == centroVenta.Id);
             if(facturas.Any())
