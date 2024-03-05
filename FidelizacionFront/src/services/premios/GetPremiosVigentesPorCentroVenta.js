@@ -1,6 +1,6 @@
 import configData from '../../config.json'
 
-const GetPremiosVigentesPorCompania = async (centroVentaId) => {
+const GetPremiosVigentesPorCentroVenta = async (centroVentaId) => {
   try {
     const token = localStorage.getItem('token')
     const response = await fetch(
@@ -31,4 +31,4 @@ const GetPremiosVigentesPorCompania = async (centroVentaId) => {
   }
 }
 
-export default GetPremiosVigentesPorCompania
+export default GetPremiosVigentesPorCentroVenta

@@ -7,7 +7,6 @@ namespace Dominio.Entidades
         public Compania()
         {
             CentroVentas = new List<CentroVenta>();
-            Premios = new List<Premio>();
         }
         public int? Id { get; set; }
         public string Nombre { get; set; }
@@ -17,6 +16,5 @@ namespace Dominio.Entidades
         public int EstadoId { get; set; } = (int)EstadoEnum.Activo;
         public virtual Estado? Estado { get; set; }
         public virtual IEnumerable<CentroVenta>? CentroVentas { get; set; }
-        public virtual IEnumerable<Premio> Premios { get; set; }
     }
 }

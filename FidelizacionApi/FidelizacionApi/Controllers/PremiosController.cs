@@ -44,7 +44,7 @@ namespace FidelizacionApi.Controllers
         {
             try
             {
-                return Ok(await _mediator.Send(new ObtenerPremiosVigentesQuery(centroVentaId), cancellationToken));
+                return Ok(await _mediator.Send(new ObtenerPremiosPorCentroVentaQuery(centroVentaId), cancellationToken));
             }
             catch (Exception ex) when (ex is not ApiException)
             {

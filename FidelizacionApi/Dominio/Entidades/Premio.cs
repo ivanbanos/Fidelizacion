@@ -12,8 +12,8 @@ namespace Dominio.Entidades
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
         public int EstadoId { get; set; }
-        public int CompaniaId { get; set; }
-        public virtual Compania Compania { get; set; }
+        public int? CentroVentaId { get; set; }
+        public virtual CentroVenta? CentroVenta { get; set; }
 
         public virtual IEnumerable<Redencion> Redenciones { get; set; }
 

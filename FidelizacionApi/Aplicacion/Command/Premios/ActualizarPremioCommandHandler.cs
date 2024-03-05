@@ -29,6 +29,7 @@ namespace Aplicacion.Command.Premios
             premio.Puntos = request.Puntos;
             premio.Precio = request.Precio;
             premio.FechaFin = request.FechaFin;
+            premio.CentroVentaId = request.CentroVentaId;
 
             await _repositorioPremio.UpdateAsync(premio);
 

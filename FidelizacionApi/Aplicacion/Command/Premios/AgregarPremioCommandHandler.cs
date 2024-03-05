@@ -32,7 +32,7 @@ namespace Aplicacion.Command.Premios
             var centroDeVenta = centroDeVentas.FirstOrDefault();
 
             var premio = _mapper.Map<Premio>(request);
-            premio.CompaniaId = centroDeVenta.CompaniaId;
+            premio.CentroVentaId = centroDeVenta.Id;
             var premioCreado = await _repositorioPremio.AddAsync(premio);
             return premioCreado != null;
         }

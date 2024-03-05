@@ -23,7 +23,7 @@ import {
 import GetCentroVentas from '../../services/centroVentas/GetCentroVentas'
 import GetCentroVentaPorCompania from '../../services/centroVentas/GetCentroVentaPorCompania'
 import GetPremiosPorCompania from 'src/services/premios/GetPremiosPorCompania'
-import GetPremiosVigentesPorCompania from 'src/services/premios/GetPremiosVidentesPorCompania'
+import GetPremiosVigentesPorCentroVenta from 'src/services/premios/GetPremiosVigentesPorCentroVenta'
 import AddPremio from 'src/services/premios/AddPremio'
 import UpdatePremio from 'src/services/premios/UpdatePremio'
 import DeletePremio from 'src/services/premios/DeletePremio'
@@ -35,8 +35,9 @@ const AddPremioModal = (props) => {
   const centroVenta = localStorage.getItem('idCentroVenta')
   const [validated, setValidated] = useState(false)
   const [addPremioVisible, setAddPremioVisible] = useState(false)
-  const [centroVentaDisabled, setCentroVentaDisabled] = useState(perfil === 1)
-  const [inputCentroVentaVisible, setCentroVentaVisible] = useState(perfil === '1')
+  const [inputCentroVentaVisible, setCentroVentaVisible] = useState(
+    perfil === '1' || perfil === '2',
+  )
   const [newDescripcion, setNewDescripcion] = useState()
   const [newPuntos, setNewPuntosChange] = useState()
   const [newPrecio, setNewPrecioChange] = useState()
@@ -72,7 +73,7 @@ const AddPremioModal = (props) => {
         newPuntos,
         newPrecio,
         newFechaFin,
-        newCentroVenta === '0' ? null : newCentroVenta,
+        newCentroVenta === '0' ? centroVenta : newCentroVenta,
       )
       props.GetPremios()
       setValidated(false)
@@ -162,7 +163,6 @@ const AddPremioModal = (props) => {
                     aria-label="Centro de venta"
                     feedbackInvalid="Este campo es requerido"
                     onChange={handleCentroVentaChange}
-                    disabled={centroVentaDisabled}
                     required
                   >
                     <option selected="" value="">
@@ -202,16 +202,16 @@ const TaskPremio = (props) => {
   const [validated, setValidated] = useState(false)
   const [validatedRedimir, setValidatedRedimir] = useState(false)
   const [respuestaRedecionPremio, setRespuestaRedecionPremio] = useState({})
-  const [centroVentaDisabled, setCentroVentaDisabled] = useState(perfil === 1)
-  const [inputCentroVentaVisible, setCentroVentaVisible] = useState(perfil === '1')
-
+  const [inputCentroVentaVisible, setCentroVentaVisible] = useState(
+    perfil === '1' || perfil === '2',
+  )
   const [newDescripcion, setNewDescripcion] = useState(props.Premio.nombre)
   const [newPuntos, setNewPuntosChange] = useState(props.Premio.puntos)
   const [newPrecio, setNewPrecioChange] = useState(props.Premio.precio)
   const [newFechaFin, setNewFechaFinChange] = useState(props.Premio.fechaFin)
   const [newDocumentoFidelizado, setNewDocumentoFidelizadoChange] = useState()
   const [newCantidad, setNewCantidadChange] = useState()
-  const [newCentroVenta, setNewCentroVentaChange] = useState(centroVenta)
+  const [newCentroVenta, setNewCentroVentaChange] = useState(props.Premio.centroVentaId)
 
   const handleDescripcionChange = (event) => {
     setNewDescripcion(event.target.value)
@@ -248,6 +248,7 @@ const TaskPremio = (props) => {
       premio.puntos = newPuntos
       premio.precio = newPrecio
       premio.fechaFin = newFechaFin
+      premio.centroVentaId = newCentroVenta === '0' ? centroVenta : newCentroVenta
       let resultado = await UpdatePremio(props.Premio)
       props.GetPremios()
       setValidated(false)
@@ -418,7 +419,6 @@ const TaskPremio = (props) => {
                         aria-label="Centro de venta"
                         feedbackInvalid="Este campo es requerido"
                         onChange={handleCentroVentaChange}
-                        disabled={centroVentaDisabled}
                         required
                       >
                         <option selected="" value="">
@@ -582,7 +582,7 @@ const Premios = () => {
     if (perfil === '1' || perfil === '2') {
       resultado = await GetPremiosPorCompania(centroVenta)
     } else {
-      resultado = await GetPremiosVigentesPorCompania(centroVenta)
+      resultado = await GetPremiosVigentesPorCentroVenta(centroVenta)
     }
     if (resultado.status === 401) {
       navigate('/Login', { replace: true })
