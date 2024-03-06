@@ -1,9 +1,9 @@
 ﻿using Aplicacion.Command.Usuarios;
+using Aplicacion.Exepciones;
 using Aplicacion.Query.Usuarios;
 using Aplicacion.Query.ValidacionUsuario;
 using Dominio.Autenticacion;
 using Dominio.Entidades;
-using FidelizacionApi.Dtos.Usuarios;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,33 +26,65 @@ namespace FidelizacionApi.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Create(AgregarUsuarioDto usuario, CancellationToken cancellationToken)
+        public async Task<IActionResult> Create(CrearUsuarioCommand usuario, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new CrearUsuarioCommand(new Usuario { NombreUsuario = usuario.NombreUsuario, CentroVentaId = usuario.CentroVentaId, PerfilId = usuario.Perfil, Guid = Guid.NewGuid() }), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(usuario, cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se creaba el usuario.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpGet]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<Usuario>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<Usuario>> GetUsuario(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetUsuario(CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerUsuariosQuery(), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerUsuariosQuery(), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenian los usuarios.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpGet("CentroVenta/{id}")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<Usuario>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<Usuario>> GetUsuariosPorCentroVenta(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetUsuariosPorCentroVenta(int id, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerUsuariosPorCentroVentaQuery(id), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerUsuariosPorCentroVentaQuery(id), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenian los usuarios por centro de venta.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpGet("Compania/{id}")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<Usuario>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<Usuario>> GetUsuariosPorCompania(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetUsuariosPorCompania(int id, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerUsuariosPorCompaniaQuery(id), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerUsuariosPorCompaniaQuery(id), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenian los usuarios por compañia.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpGet("{nombreUsuario}/{contrasena}")]
@@ -60,25 +92,49 @@ namespace FidelizacionApi.Controllers
         [ProducesResponseType(typeof(AuthenticationInfo), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        public async Task<AuthenticationInfo> Authenticate(string nombreUsuario, string contrasena, CancellationToken cancellationToken)
+        public async Task<IActionResult> Authenticate(string nombreUsuario, string contrasena, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ValidacionUsuarioContrasenaQuery(nombreUsuario, contrasena), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ValidacionUsuarioContrasenaQuery(nombreUsuario, contrasena), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se autenticaba el usuario.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpPut]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Update(Usuario usuario, CancellationToken cancellationToken)
+        public async Task<IActionResult> Update(ActualizarUsuarioCommand usuario, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ActualizarUsuarioCommand(usuario), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(usuario, cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se actualizaba el usuario.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpDelete("{usuario}")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Delete(Guid usuario, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete(Guid usuario, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new EliminarUsuarioCommand(usuario), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new EliminarUsuarioCommand(usuario), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se eliminaba el usuario.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
     }
 }

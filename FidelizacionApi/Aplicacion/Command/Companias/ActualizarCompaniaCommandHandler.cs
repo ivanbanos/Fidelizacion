@@ -1,8 +1,10 @@
-﻿using Datos.Common;
+﻿using Aplicacion.Exepciones;
+using Datos.Common;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
-namespace Aplicacion.Command.Compania
+namespace Aplicacion.Command.Companias
 {
     public class ActualizarCompaniaCommandHandler : IRequestHandler<ActualizarCompaniaCommand, bool>
     {
@@ -17,12 +19,18 @@ namespace Aplicacion.Command.Compania
 
         public async Task<bool> Handle(ActualizarCompaniaCommand request, CancellationToken cancellationToken)
         {
-            var compania = await _repositorioGenerico.GetAsync(x => x.Id == request.Compania.Id);
+            var companias = await _repositorioGenerico.GetAsync(x => x.Id == request.Id);
 
-            if (compania == null) 
-                return false;
+            if (companias == null)
+                throw new ApiException() { ExceptionMessage = "Compañia no existe", StatusCode = HttpStatusCode.BadRequest };
 
-            await _repositorioGenerico.UpdateAsync(request.Compania);
+            var compania = companias.FirstOrDefault();
+
+            compania.Nombre = request.Nombre;
+            compania.VigenciaPuntos = request.VigenciaPuntos;
+            compania.TipoVencimientoId = request.TipoVencimientoId;
+
+            await _repositorioGenerico.UpdateAsync(compania);
             return true;
         }
     }

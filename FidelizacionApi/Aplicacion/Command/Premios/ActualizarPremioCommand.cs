@@ -9,14 +9,16 @@ namespace Aplicacion.Command.Premios
         public int Puntos { get; set; }
         public float Precio { get; set; }
         public DateTime FechaFin { get; set; }
+        public int CentroVentaId { get; set; }
 
-        public ActualizarPremioCommand(Guid guid, string nombre, int puntos, float precio, DateTime fechaFin)
+        public ActualizarPremioCommand(Guid guid, string nombre, int puntos, float precio, DateTime fechaFin, int centroVentaId)
         {
             Guid = guid;
             Nombre = nombre;
             Puntos = puntos;
             Precio = precio;
             FechaFin = fechaFin;
+            CentroVentaId = centroVentaId;
         }
     }
 }

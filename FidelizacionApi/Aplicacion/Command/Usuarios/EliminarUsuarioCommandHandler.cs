@@ -1,9 +1,10 @@
-﻿using Aplicacion.Extension;
+﻿using Aplicacion.Exepciones;
 using Datos.Common;
 using Dominio.Common.Enum;
 using Dominio.Entidades;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace Aplicacion.Command.Usuarios
 {
@@ -22,12 +23,9 @@ namespace Aplicacion.Command.Usuarios
         {
             var usuarios = await _repositorioGenerico.GetAsync(u => u.Guid.Equals(request.Usuario));
             if (usuarios == null)
-                return false;
+                throw new ApiException() { ExceptionMessage = "Usuario no existe", StatusCode = HttpStatusCode.BadRequest };
 
             var usuario = usuarios.FirstOrDefault();
-
-            if (usuario == null)
-                return false;
 
             usuario.EstadoId = (int)EstadoEnum.Inactivo;
             await _repositorioGenerico.UpdateAsync(usuario);

@@ -1,8 +1,10 @@
-﻿using AutoMapper;
+﻿using Aplicacion.Exepciones;
+using AutoMapper;
 using Datos.Common;
 using Dominio.Entidades;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace Aplicacion.Command.Fidelizados
 {
@@ -22,7 +24,7 @@ namespace Aplicacion.Command.Fidelizados
             var fidelizados = await _repositorioGenerico.GetAsync(x => x.Id == request.Id, includeProperties: "InformacionAdicional");
 
             if (!fidelizados.Any())
-                return false;
+                throw new ApiException() { ExceptionMessage = "Fidelizado no existe", StatusCode = HttpStatusCode.BadRequest };
 
             var fidelizado = fidelizados.FirstOrDefault();
 

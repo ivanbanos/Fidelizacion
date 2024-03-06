@@ -25,6 +25,7 @@ namespace Datos
         public DbSet<Usuario> Usuario { get; set; }
         public DbSet<Punto> Punto { get; set; }
         public DbSet<Perfil> Perfil { get; set; }
+        public DbSet<Premio> Premio { get; set; }
         public DbSet<Redencion> Redencion { get; set; }
         #region StroredProcedures
         public DbSet<FidelizadoDto> ObtenerFidelizados { get; set; }
@@ -63,6 +64,12 @@ namespace Datos
                     .HasOne(r => r.Premio)
                     .WithMany(p => p.Redenciones)
                     .HasForeignKey(r => r.PremioId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Premio>()
+                    .HasOne(p => p.CentroVenta)
+                    .WithMany(cv => cv.Premios)
+                    .HasForeignKey(p => p.CentroVentaId)
                     .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<TipoVencimiento>().HasData(new TipoVencimiento[]

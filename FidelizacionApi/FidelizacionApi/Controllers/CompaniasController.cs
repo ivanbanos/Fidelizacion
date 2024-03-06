@@ -1,5 +1,6 @@
-﻿using Aplicacion.Command.Compania;
-using Aplicacion.Query.Compania;
+﻿using Aplicacion.Command.Companias;
+using Aplicacion.Exepciones;
+using Aplicacion.Query.Companias;
 using Dominio.Entidades;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -24,41 +25,81 @@ namespace FidelizacionApi.Controllers
         [HttpGet]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<Compania>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<Compania>> GetCompania(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetCompania(CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerCompaniasQuery(), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerCompaniasQuery(), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenian las compañias.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         // GET: api/Companias/5
         [HttpGet("{id}")]
         [Authtentication.Authorize]
-        public async Task<ActionResult<Compania>> GetCompania(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetCompania(int id, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerCompaniaQuery(id), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerCompaniaQuery(id), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenian las compañias.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpPut]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Put(Compania compania, CancellationToken cancellationToken)
+        public async Task<IActionResult> Put(ActualizarCompaniaCommand compania, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ActualizarCompaniaCommand(compania), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(compania, cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenian las compañias.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpPost]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> Create(Compania compania, CancellationToken cancellationToken)
+        public async Task<IActionResult> Create(AgregarCompaniaCommand compania, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new AgregarCompaniaCommand(compania), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(compania, cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenian las compañias.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpDelete("{id}")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        public async Task<bool> DeleteCompania(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteCompania(int id, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new EliminarCompaniaCommand(id), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new EliminarCompaniaCommand(id), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenian las compañias.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
     }
 }

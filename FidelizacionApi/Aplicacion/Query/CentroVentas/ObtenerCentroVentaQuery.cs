@@ -1,9 +1,9 @@
-﻿using Dominio.Entidades;
+﻿using Aplicacion.Query.CentroVentas.Dtos;
 using MediatR;
 
 namespace Aplicacion.Query.CentroVentas
 {
-    public class ObtenerCentroVentaQuery : IRequest<CentroVenta>
+    public class ObtenerCentroVentaQuery : IRequest<CentroVentaDto>
     {
         public int Id { get; }
 

@@ -32,7 +32,7 @@ namespace Aplicacion.Query.Premios
 
             var centroDeVenta = centroDeVentas.FirstOrDefault();
 
-            var premios = await _repositorioPremio.GetAsync(p => p.EstadoId == (int)EstadoEnum.Activo && centroDeVenta.Compania.Id == p.CompaniaId);
+            var premios = await _repositorioPremio.GetAsync(p => p.EstadoId == (int)EstadoEnum.Activo && p.CentroVenta.CompaniaId == centroDeVenta.CompaniaId, includeProperties: "CentroVenta,CentroVenta.Compania");
             return _mapper.Map<IEnumerable<PremioDTO>>(premios);
         }
     }

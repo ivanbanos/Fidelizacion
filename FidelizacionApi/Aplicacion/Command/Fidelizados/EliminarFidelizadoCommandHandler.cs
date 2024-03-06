@@ -1,8 +1,10 @@
-﻿using Datos.Common;
+﻿using Aplicacion.Exepciones;
+using Datos.Common;
 using Dominio.Common.Enum;
 using Dominio.Entidades;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace Aplicacion.Command.Fidelizados
 {
@@ -21,8 +23,8 @@ namespace Aplicacion.Command.Fidelizados
         {
             var fidelizado = await _repositorioGenerico.GetByIdAsync(request.Id);
 
-            if (fidelizado == null) 
-                return false;
+            if (fidelizado == null)
+                throw new ApiException() { ExceptionMessage = "Fidelizado no existe", StatusCode = HttpStatusCode.BadRequest };
 
             fidelizado.EstadoId = (int)EstadoEnum.Inactivo;
             await _repositorioGenerico.UpdateAsync(fidelizado);

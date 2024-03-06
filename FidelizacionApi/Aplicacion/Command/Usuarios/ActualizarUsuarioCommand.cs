@@ -1,15 +1,22 @@
-﻿using Dominio.Entidades;
-using MediatR;
+﻿using MediatR;
 
 namespace Aplicacion.Command.Usuarios
 {
     public class ActualizarUsuarioCommand : IRequest<bool>
     {
-        public Usuario Usuario { get; }
+        public Guid Guid { get; set; }
+        public string NombreUsuario { get; }
+        public int PerfilId { get; }
+        public int? CentroVentaId { get; }
 
-        public ActualizarUsuarioCommand(Usuario usuario)
+        public ActualizarUsuarioCommand(Guid guid, 
+                        string nombreUsuario,
+                        int perfilId,
+                        int centroVentaId)
         {
-            Usuario = usuario;
+            Guid = guid;
+            PerfilId = perfilId;
+            CentroVentaId = centroVentaId;
         }
     }
 }

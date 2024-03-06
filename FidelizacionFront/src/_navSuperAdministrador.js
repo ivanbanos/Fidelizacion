@@ -37,18 +37,6 @@ const _navSuperAdministrador = [
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
   },
   {
-    component: CNavItem,
-    name: 'Fidelizados',
-    to: '/fidelizados',
-    icon: <CIcon icon={cilContact} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Premios',
-    to: '/premios',
-    icon: <CIcon icon={cilGift} customClassName="nav-icon" />,
-  },
-  {
     component: CNavGroup,
     name: 'Reportes',
     to: '/base',

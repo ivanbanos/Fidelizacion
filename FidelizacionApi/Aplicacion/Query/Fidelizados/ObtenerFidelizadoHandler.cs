@@ -13,7 +13,9 @@ namespace Aplicacion.Query.Fidelizados
         private readonly IRepositorioGenerico<Fidelizado> _repositorioGenerico;
         private readonly IMapper _mapper;
 
-        public ObtenerFidelizadoHandler(ILogger<ObtenerFidelizadoHandler> logger, IRepositorioGenerico<Fidelizado> repositorioGenerico, IMapper mapper)
+        public ObtenerFidelizadoHandler(ILogger<ObtenerFidelizadoHandler> logger, 
+                                        IRepositorioGenerico<Fidelizado> repositorioGenerico, 
+                                        IMapper mapper)
         {
             _logger = logger;
             _repositorioGenerico = repositorioGenerico;

@@ -1,4 +1,5 @@
 ﻿using Aplicacion.Command.Contrasena;
+using Aplicacion.Exepciones;
 using Aplicacion.Query.Configuraciones;
 using Dominio.Entidades;
 using FidelizacionApi.Dtos.Contrasena;
@@ -33,18 +34,34 @@ namespace FidelizacionApi.Controllers
         [Route("Ciudades")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<Ciudad>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<Ciudad>> GetCiudades(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetCiudades(CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerCiudadesQuery(), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerCiudadesQuery(), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenian los usuarios.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
 
         [HttpGet]
         [Route("Perfiles")]
         [Authtentication.Authorize]
         [ProducesResponseType(typeof(IEnumerable<Perfil>), (int)HttpStatusCode.OK)]
-        public async Task<IEnumerable<Perfil>> GetPerfiles(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetPerfiles(CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new ObtenerPerfilesQuery(), cancellationToken);
+            try
+            {
+                return Ok(await _mediator.Send(new ObtenerPerfilesQuery(), cancellationToken));
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError($"Error mientras se obtenian los usuarios.", ex);
+                return StatusCode(500, "Ocurrió un error mientras se procesaba su petición.");
+            }
         }
     }
 }

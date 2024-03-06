@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Aplicacion.Command.Compania
+namespace Aplicacion.Command.Companias
 {
     public class EliminarCompaniaCommand : IRequest<bool>
     {

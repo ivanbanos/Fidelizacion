@@ -11,29 +11,33 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CForm,
   CFormInput,
+  CFormSelect,
   CModal,
   CModalBody,
   CModalFooter,
   CModalHeader,
   CModalTitle,
-  CFormSelect,
 } from '@coreui/react'
 import GetCentroVentas from '../../services/centroVentas/GetCentroVentas'
 import GetCentroVentaPorCompania from '../../services/centroVentas/GetCentroVentaPorCompania'
 import GetPremiosPorCompania from 'src/services/premios/GetPremiosPorCompania'
-import GetPremiosVigentesPorCompania from 'src/services/premios/GetPremiosVidentesPorCompania'
+import GetPremiosVigentesPorCentroVenta from 'src/services/premios/GetPremiosVigentesPorCentroVenta'
 import AddPremio from 'src/services/premios/AddPremio'
 import UpdatePremio from 'src/services/premios/UpdatePremio'
 import DeletePremio from 'src/services/premios/DeletePremio'
 import RedimirPremio from 'src/services/premios/RedimirPremio'
+import Toast from '../notifications/toasts/Toasts'
 
 const AddPremioModal = (props) => {
   const perfil = localStorage.getItem('perfil')
   const centroVenta = localStorage.getItem('idCentroVenta')
+  const [validated, setValidated] = useState(false)
   const [addPremioVisible, setAddPremioVisible] = useState(false)
-  const [centroVentaDisabled, setCentroVentaDisabled] = useState(true)
-  const [inputCentroVentaVisible, setCentroVentaVisible] = useState(perfil === '1')
+  const [inputCentroVentaVisible, setCentroVentaVisible] = useState(
+    perfil === '1' || perfil === '2',
+  )
   const [newDescripcion, setNewDescripcion] = useState()
   const [newPuntos, setNewPuntosChange] = useState()
   const [newPrecio, setNewPrecioChange] = useState()
@@ -55,17 +59,32 @@ const AddPremioModal = (props) => {
   const handleCentroVentaChange = (event) => {
     setNewCentroVentaChange(event.target.value)
   }
-  const addPremio = async () => {
-    await AddPremio(
-      newDescripcion,
-      newPuntos,
-      newPrecio,
-      newFechaFin,
-      newCentroVenta === '0' ? null : newCentroVenta,
-    )
-    props.GetPremios()
-    setNewCentroVentaChange(centroVenta)
-    setAddPremioVisible(false)
+
+  const handleSubmit = async (event) => {
+    const form = event.currentTarget
+    if (form.checkValidity() === false) {
+      event.preventDefault()
+      event.stopPropagation()
+      setValidated(true)
+    }
+    if (form.checkValidity() === true) {
+      let resultado = await AddPremio(
+        newDescripcion,
+        newPuntos,
+        newPrecio,
+        newFechaFin,
+        newCentroVenta === '0' ? centroVenta : newCentroVenta,
+      )
+      props.GetPremios()
+      setValidated(false)
+      if (resultado.status === 400 || resultado.status === 403 || resultado.status === 500) {
+        props.toast.current.showToast(resultado.response, 'danger')
+      }
+      if (resultado.status === 200) {
+        props.toast.current.showToast('Premio agregado con exito', 'success')
+        setAddPremioVisible(false)
+      }
+    }
   }
 
   return (
@@ -82,58 +101,92 @@ const AddPremioModal = (props) => {
           <CModalTitle>Agregar Premio</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CRow className="mb-2">
-            <CCol xs={3}>Descripci&oacute;n*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Descripci&oacute;n" onChange={handleDescripcionChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Puntos*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Puntos" onChange={handlePuntosChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Precio*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Precio" onChange={handlePrecioChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Fecha Fin*:</CCol>
-            <CCol xs={9}>
-              <CFormInput type="date" placeholder="Fecha Fin" onChange={handleFechaFinChange} />
-            </CCol>
-          </CRow>
-          {inputCentroVentaVisible && (
+          <CForm
+            className="row g-3 needs-validation"
+            noValidate
+            validated={validated}
+            onSubmit={handleSubmit}
+          >
             <CRow className="mb-2">
-              <CCol xs={3}>Centro de Venta*:</CCol>
+              <CCol xs={3}>Descripci&oacute;n*:</CCol>
               <CCol xs={9}>
-                <CFormSelect
-                  aria-label="Default select example"
-                  onChange={handleCentroVentaChange}
-                  disabled={centroVentaDisabled}
-                >
-                  <option>Selecione un opcion</option>
-                  {props.CentroVentas.map((centroVenta) => (
-                    <option key={centroVenta.id} value={centroVenta.id}>
-                      {centroVenta.nombre}
-                    </option>
-                  ))}
-                </CFormSelect>
+                <CFormInput
+                  placeholder="Descripci&oacute;n"
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleDescripcionChange}
+                  required
+                />
               </CCol>
             </CRow>
-          )}
+            <CRow className="mb-2">
+              <CCol xs={3}>Puntos*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Puntos"
+                  type="number"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handlePuntosChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Precio*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Precio"
+                  type="number"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handlePrecioChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Fecha Fin*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Fecha Fin"
+                  type="date"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleFechaFinChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            {inputCentroVentaVisible && (
+              <CRow className="mb-2">
+                <CCol xs={3}>Centro de Venta*:</CCol>
+                <CCol xs={9}>
+                  <CFormSelect
+                    aria-label="Centro de venta"
+                    feedbackInvalid="Este campo es requerido"
+                    onChange={handleCentroVentaChange}
+                    required
+                  >
+                    <option selected="" value="">
+                      Seleccione una opci&oacute;n
+                    </option>
+                    {props.CentroVentas.map((centroVenta) => (
+                      <option key={centroVenta.id} value={centroVenta.id}>
+                        {centroVenta.nombre}
+                      </option>
+                    ))}
+                  </CFormSelect>
+                </CCol>
+              </CRow>
+            )}
+            <CModalFooter>
+              <CButton color="secondary" onClick={() => setAddPremioVisible(false)}>
+                Cerrar
+              </CButton>
+              <CButton color="primary" type="submit">
+                Agregar
+              </CButton>
+            </CModalFooter>
+          </CForm>
         </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setAddPremioVisible(false)}>
-            Cerrar
-          </CButton>
-          <CButton color="primary" onClick={addPremio}>
-            Agregar
-          </CButton>
-        </CModalFooter>
       </CModal>
     </>
   )
@@ -146,19 +199,19 @@ const TaskPremio = (props) => {
   const [deletePremioVisible, setDeletePremioVisible] = useState(false)
   const [redimirPremioVisible, setRedimirPremioVisible] = useState(false)
   const [respuestaRedimirPremioVisible, setRespuestaRedimirPremioVisible] = useState(false)
+  const [validated, setValidated] = useState(false)
+  const [validatedRedimir, setValidatedRedimir] = useState(false)
   const [respuestaRedecionPremio, setRespuestaRedecionPremio] = useState({})
-  const [centroVentaDisabled, setCentroVentaDisabled] = useState(perfil === 1)
-  const [inputCentroVentaVisible, setCentroVentaVisible] = useState(perfil === '1')
-
+  const [inputCentroVentaVisible, setCentroVentaVisible] = useState(
+    perfil === '1' || perfil === '2',
+  )
   const [newDescripcion, setNewDescripcion] = useState(props.Premio.nombre)
   const [newPuntos, setNewPuntosChange] = useState(props.Premio.puntos)
   const [newPrecio, setNewPrecioChange] = useState(props.Premio.precio)
   const [newFechaFin, setNewFechaFinChange] = useState(props.Premio.fechaFin)
   const [newDocumentoFidelizado, setNewDocumentoFidelizadoChange] = useState()
   const [newCantidad, setNewCantidadChange] = useState()
-  const [newCentroVenta, setNewCentroVentaChange] = useState(centroVenta)
-
-  let respuesta2 = {}
+  const [newCentroVenta, setNewCentroVentaChange] = useState(props.Premio.centroVentaId)
 
   const handleDescripcionChange = (event) => {
     setNewDescripcion(event.target.value)
@@ -182,33 +235,69 @@ const TaskPremio = (props) => {
     setNewCentroVentaChange(event.target.value)
   }
 
-  const updatePremio = async () => {
-    let premio = props.Premio
-    premio.nombre = newDescripcion
-    premio.puntos = newPuntos
-    premio.precio = newPrecio
-    premio.fechaFin = newFechaFin
-    await UpdatePremio(props.Premio)
-    props.GetPremios()
-    setNewCentroVentaChange(centroVenta)
-    setUpdatePremioVisible(false)
+  const handleSubmit = async (event) => {
+    const form = event.currentTarget
+    if (form.checkValidity() === false) {
+      event.preventDefault()
+      event.stopPropagation()
+      setValidated(true)
+    }
+    if (form.checkValidity() === true) {
+      let premio = props.Premio
+      premio.nombre = newDescripcion
+      premio.puntos = newPuntos
+      premio.precio = newPrecio
+      premio.fechaFin = newFechaFin
+      premio.centroVentaId = newCentroVenta === '0' ? centroVenta : newCentroVenta
+      let resultado = await UpdatePremio(props.Premio)
+      props.GetPremios()
+      setValidated(false)
+      if (resultado.status === 400 || resultado.status === 403 || resultado.status === 500) {
+        props.toast.current.showToast(resultado.response, 'danger')
+      }
+      if (resultado.status === 200) {
+        props.toast.current.showToast('Premio actualizado con exito', 'success')
+        setUpdatePremioVisible(false)
+      }
+    }
   }
   const deletePremio = async () => {
-    await DeletePremio(props.Premio.guid)
+    let resultado = await DeletePremio(props.Premio.guid)
+    if (resultado.status === 400 || resultado.status === 500) {
+      props.toast.current.showToast(resultado.response, 'danger')
+    }
     props.GetPremios()
     setDeletePremioVisible(false)
+    if (resultado.status === 200) {
+      props.toast.current.showToast('Premio eliminado con exito', 'success')
+    }
   }
-  const redimirPremio = async () => {
-    let respuesta = await RedimirPremio(
-      props.Premio.guid,
-      newCantidad,
-      newDocumentoFidelizado,
-      centroVenta,
-    )
-    setRespuestaRedecionPremio(respuesta)
-    props.GetPremios()
-    setRedimirPremioVisible(false)
-    setRespuestaRedimirPremioVisible(true)
+  const redimirPremio = async (event) => {
+    const form = event.currentTarget
+    if (form.checkValidity() === false) {
+      event.preventDefault()
+      event.stopPropagation()
+      setValidated(true)
+    }
+
+    if (form.checkValidity() === true) {
+      let resultado = await RedimirPremio(
+        props.Premio.guid,
+        newCantidad,
+        newDocumentoFidelizado,
+        centroVenta,
+      )
+      props.GetPremios()
+      setValidated(false)
+      if (resultado.status === 400 || resultado.status === 403 || resultado.status === 500) {
+        props.toast.current.showToast(resultado.response, 'danger')
+      }
+      setRedimirPremioVisible(false)
+      if (resultado.status === 200) {
+        setRespuestaRedecionPremio(resultado.response)
+        setRespuestaRedimirPremioVisible(true)
+      }
+    }
   }
 
   const handlePrint = () => {
@@ -263,76 +352,97 @@ const TaskPremio = (props) => {
               <CModalTitle>Actualizar Premio</CModalTitle>
             </CModalHeader>
             <CModalBody>
-              <CRow className="mb-2">
-                <CCol xs={3}>Descripci&oacute;n*:</CCol>
-                <CCol xs={9}>
-                  <CFormInput
-                    value={newDescripcion}
-                    placeholder="Descripci&oacute;n"
-                    onChange={handleDescripcionChange}
-                  />
-                </CCol>
-              </CRow>
-              <CRow className="mb-2">
-                <CCol xs={3}>Puntos*:</CCol>
-                <CCol xs={9}>
-                  <CFormInput
-                    value={newPuntos}
-                    placeholder="Puntos"
-                    onChange={handlePuntosChange}
-                  />
-                </CCol>
-              </CRow>
-              <CRow className="mb-2">
-                <CCol xs={3}>Precio*:</CCol>
-                <CCol xs={9}>
-                  <CFormInput
-                    value={newPrecio}
-                    placeholder="Precio"
-                    onChange={handlePrecioChange}
-                  />
-                </CCol>
-              </CRow>
-              <CRow className="mb-2">
-                <CCol xs={3}>Fecha Fin*:</CCol>
-                <CCol xs={9}>
-                  <CFormInput
-                    type="date"
-                    value={newFechaFin}
-                    placeholder="Fecha Fin"
-                    onChange={handleFechaFinChange}
-                  />
-                </CCol>
-              </CRow>
-              {inputCentroVentaVisible && (
+              <CForm
+                className="row g-3 needs-validation"
+                noValidate
+                validated={validated}
+                onSubmit={handleSubmit}
+              >
                 <CRow className="mb-2">
-                  <CCol xs={3}>Centro de Venta*:</CCol>
+                  <CCol xs={3}>Descripci&oacute;n*:</CCol>
                   <CCol xs={9}>
-                    <CFormSelect
-                      value={newCentroVenta}
-                      aria-label="Default select example"
-                      onChange={handleCentroVentaChange}
-                      disabled={centroVentaDisabled}
-                    >
-                      <option>Selecione un opcion</option>
-                      {props.CentroVentas.map((centroVenta) => (
-                        <option key={centroVenta.id} value={centroVenta.id}>
-                          {centroVenta.nombre}
-                        </option>
-                      ))}
-                    </CFormSelect>
+                    <CFormInput
+                      value={newDescripcion}
+                      placeholder="Descripci&oacute;n"
+                      type="text"
+                      feedbackInvalid="Este campo es requerido"
+                      onChange={handleDescripcionChange}
+                      required
+                    />
                   </CCol>
                 </CRow>
-              )}
+                <CRow className="mb-2">
+                  <CCol xs={3}>Puntos*:</CCol>
+                  <CCol xs={9}>
+                    <CFormInput
+                      value={newPuntos}
+                      placeholder="Puntos"
+                      type="number"
+                      feedbackInvalid="Este campo es requerido"
+                      onChange={handlePuntosChange}
+                      required
+                    />
+                  </CCol>
+                </CRow>
+                <CRow className="mb-2">
+                  <CCol xs={3}>Precio*:</CCol>
+                  <CCol xs={9}>
+                    <CFormInput
+                      value={newPrecio}
+                      placeholder="Precio"
+                      type="number"
+                      feedbackInvalid="Este campo es requerido"
+                      onChange={handlePrecioChange}
+                      required
+                    />
+                  </CCol>
+                </CRow>
+                <CRow className="mb-2">
+                  <CCol xs={3}>Fecha Fin*:</CCol>
+                  <CCol xs={9}>
+                    <CFormInput
+                      value={newFechaFin}
+                      placeholder="Fecha Fin"
+                      type="date"
+                      feedbackInvalid="Este campo es requerido"
+                      onChange={handleFechaFinChange}
+                      required
+                    />
+                  </CCol>
+                </CRow>
+                {inputCentroVentaVisible && (
+                  <CRow className="mb-2">
+                    <CCol xs={3}>Centro de Venta*:</CCol>
+                    <CCol xs={9}>
+                      <CFormSelect
+                        value={newCentroVenta}
+                        aria-label="Centro de venta"
+                        feedbackInvalid="Este campo es requerido"
+                        onChange={handleCentroVentaChange}
+                        required
+                      >
+                        <option selected="" value="">
+                          Seleccione una opci&oacute;n
+                        </option>
+                        {props.CentroVentas.map((centroVenta) => (
+                          <option key={centroVenta.id} value={centroVenta.id}>
+                            {centroVenta.nombre}
+                          </option>
+                        ))}
+                      </CFormSelect>
+                    </CCol>
+                  </CRow>
+                )}
+                <CModalFooter>
+                  <CButton color="secondary" onClick={() => setUpdatePremioVisible(false)}>
+                    Cerrar
+                  </CButton>
+                  <CButton color="primary" type="submit">
+                    Actualizar
+                  </CButton>
+                </CModalFooter>
+              </CForm>
             </CModalBody>
-            <CModalFooter>
-              <CButton color="secondary" onClick={() => setUpdatePremioVisible(false)}>
-                Cerrar
-              </CButton>
-              <CButton color="primary" onClick={updatePremio}>
-                Actualizar
-              </CButton>
-            </CModalFooter>
           </CModal>
           <CButton style={{ margin: '2pt' }} onClick={() => setDeletePremioVisible(true)}>
             <CIcon icon={cilX} size="sm" />
@@ -374,30 +484,46 @@ const TaskPremio = (props) => {
           <CModalTitle>Redimir Premio</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CRow className="mb-2">
-            <CCol xs={3}>Documento Fidelizado*:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                placeholder="Documento Fidelizado"
-                onChange={handleDocumentoFidelizadoChange}
-              />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Cantidad*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Cantidad" onChange={handleCantidadChange} />
-            </CCol>
-          </CRow>
+          <CForm
+            className="row g-3 needs-validation"
+            noValidate
+            validated={validatedRedimir}
+            onSubmit={redimirPremio}
+          >
+            <CRow className="mb-2">
+              <CCol xs={3}>Documento Fidelizado*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Documento Fidelizado"
+                  type="number"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleDocumentoFidelizadoChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Cantidad*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Cantidad"
+                  type="number"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleCantidadChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CModalFooter>
+              <CButton color="secondary" onClick={() => setRedimirPremioVisible(false)}>
+                Cerrar
+              </CButton>
+              <CButton color="primary" type="submit">
+                Redimir
+              </CButton>
+            </CModalFooter>
+          </CForm>
         </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setRedimirPremioVisible(false)}>
-            Cerrar
-          </CButton>
-          <CButton color="primary" onClick={redimirPremio}>
-            Redimir
-          </CButton>
-        </CModalFooter>
       </CModal>
       <CModal
         visible={respuestaRedimirPremioVisible}
@@ -452,32 +578,36 @@ const Premios = () => {
   const toastRef = useRef()
 
   const fetchPremios = async () => {
-    let premios = []
+    let resultado = []
     if (perfil === '1' || perfil === '2') {
-      premios = await GetPremiosPorCompania(centroVenta)
+      resultado = await GetPremiosPorCompania(centroVenta)
     } else {
-      premios = await GetPremiosVigentesPorCompania(centroVenta)
+      resultado = await GetPremiosVigentesPorCentroVenta(centroVenta)
     }
-
-    if (premios === 'fail') {
+    if (resultado.status === 401) {
       navigate('/Login', { replace: true })
     }
-
-    setPremios(premios)
+    if (resultado.status === 400 || resultado.status === 500) {
+      toastRef.current.showToast(resultado.response, 'danger')
+    }
+    if (resultado.status === 200) {
+      setPremios(resultado.response)
+    }
   }
 
   const fetchCentroVentas = async () => {
-    let CentroVentas = []
+    let resultado = []
     if (perfil === '1') {
-      CentroVentas = await GetCentroVentas()
+      resultado = await GetCentroVentas()
     } else {
-      CentroVentas = await GetCentroVentaPorCompania()
+      resultado = await GetCentroVentaPorCompania()
     }
-    if (CentroVentas === 'fail') {
-      navigate('/Login', { replace: true })
+    if (resultado.status === 400 || resultado.status === 500) {
+      toastRef.current.showToast(resultado.response, 'danger')
     }
-
-    setCentroVentas(CentroVentas)
+    if (resultado.status === 200) {
+      setCentroVentas(resultado.response)
+    }
   }
 
   useEffect(() => {
@@ -487,21 +617,27 @@ const Premios = () => {
 
   return (
     <>
+      <Toast ref={toastRef}></Toast>
       <h1>Premios</h1>
-      <AddPremioModal GetPremios={fetchPremios} CentroVentas={CentroVentas} />
       <CRow>
-        <CTable>
-          <CTableHead>
+        <CTable align="middle" bordered small hover>
+          <CTableHead align="middle">
             <CTableRow>
               <CTableHeaderCell scope="col">Descripción</CTableHeaderCell>
               <CTableHeaderCell scope="col">Puntos</CTableHeaderCell>
               <CTableHeaderCell scope="col">Precio</CTableHeaderCell>
               <CTableHeaderCell scope="col">Fecha de Inicio</CTableHeaderCell>
               <CTableHeaderCell scope="col">Fecha de Fin</CTableHeaderCell>
-              <CTableHeaderCell scope="col"></CTableHeaderCell>
+              <CTableHeaderCell scope="col">
+                <AddPremioModal
+                  GetPremios={fetchPremios}
+                  CentroVentas={CentroVentas}
+                  toast={toastRef}
+                />
+              </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
-          <CTableBody>
+          <CTableBody align="middle">
             {Premios.map((premio) => (
               <CTableRow key={premio.guid}>
                 <CTableHeaderCell>{premio.nombre}</CTableHeaderCell>
@@ -514,6 +650,7 @@ const Premios = () => {
                     GetPremios={fetchPremios}
                     Premio={premio}
                     CentroVentas={CentroVentas}
+                    toast={toastRef}
                   />
                 </CTableHeaderCell>
               </CTableRow>

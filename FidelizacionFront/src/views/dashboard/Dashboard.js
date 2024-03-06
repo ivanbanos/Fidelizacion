@@ -1,4 +1,5 @@
 import { React, useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import Companias from '../companias/Companias'
 import {
@@ -48,6 +49,7 @@ import CentroVentas from '../centroVentas/CentroVentas'
 import Fidelizados from '../fidelizados/Fidelizados'
 
 const Dashboard = () => {
+  let navigate = useNavigate()
   const perfil = localStorage.getItem('perfil')
   const [companiaVisible, setCompaniaVisible] = useState(false)
   const [centroVentasVisible, setCentroVentasVisible] = useState(false)
@@ -74,6 +76,9 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
+    if (perfil === 'null' || perfil === null) {
+      navigate('/Login', { replace: true })
+    }
     returnPatanllaPrincipal()
   }, [])
 

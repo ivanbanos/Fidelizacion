@@ -8535,7 +8535,7 @@ namespace Datos.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("CompaniaId")
+                    b.Property<int?>("CentroVentaId")
                         .HasColumnType("int");
 
                     b.Property<int>("EstadoId")
@@ -8562,7 +8562,7 @@ namespace Datos.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompaniaId");
+                    b.HasIndex("CentroVentaId");
 
                     b.ToTable("Premio");
                 });
@@ -8801,7 +8801,7 @@ namespace Datos.Migrations
                             Id = 1,
                             Contrasena = "$2a$11$VLwdQFPB4zzuVjRkDwm8a.AhZ8Yw6w.00YWRxwxGx5kuYQeLmRv6e",
                             EstadoId = 1,
-                            Guid = new Guid("a7ce468b-6628-428d-8b7e-023bae29183e"),
+                            Guid = new Guid("6b215857-7cac-41e9-8ffa-3f8a72c3e932"),
                             NombreUsuario = "Arthur",
                             PerfilId = 1
                         });
@@ -8935,13 +8935,12 @@ namespace Datos.Migrations
 
             modelBuilder.Entity("Dominio.Entidades.Premio", b =>
                 {
-                    b.HasOne("Dominio.Entidades.Compania", "Compania")
+                    b.HasOne("Dominio.Entidades.CentroVenta", "CentroVenta")
                         .WithMany("Premios")
-                        .HasForeignKey("CompaniaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CentroVentaId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.Navigation("Compania");
+                    b.Navigation("CentroVenta");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.Punto", b =>
@@ -9010,6 +9009,8 @@ namespace Datos.Migrations
 
             modelBuilder.Entity("Dominio.Entidades.CentroVenta", b =>
                 {
+                    b.Navigation("Premios");
+
                     b.Navigation("Usuarios");
                 });
 
@@ -9021,8 +9022,6 @@ namespace Datos.Migrations
             modelBuilder.Entity("Dominio.Entidades.Compania", b =>
                 {
                     b.Navigation("CentroVentas");
-
-                    b.Navigation("Premios");
                 });
 
             modelBuilder.Entity("Dominio.Entidades.Departamento", b =>

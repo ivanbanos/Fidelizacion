@@ -1,9 +1,11 @@
-﻿using Datos.Common;
+﻿using Aplicacion.Exepciones;
+using Datos.Common;
 using Dominio.Common.Enum;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
-namespace Aplicacion.Command.Compania
+namespace Aplicacion.Command.Companias
 {
     public class EliminarCompaniaCommandHandler : IRequestHandler<EliminarCompaniaCommand, bool>
     {
@@ -21,7 +23,7 @@ namespace Aplicacion.Command.Compania
             var compania = await _repositorioGenerico.GetByIdAsync(request.Id);
 
             if (compania == null)
-                return false;
+                throw new ApiException() { ExceptionMessage = "Compañia no existe", StatusCode = HttpStatusCode.BadRequest };
 
             compania.EstadoId = (int)EstadoEnum.Inactivo;
             await _repositorioGenerico.UpdateAsync(compania);

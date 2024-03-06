@@ -1,13 +1,9 @@
-﻿using Aplicacion.Extension;
+﻿using Aplicacion.Exepciones;
 using Datos.Common;
 using Dominio.Entidades;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net;
 
 namespace Aplicacion.Command.Usuarios
 {
@@ -24,19 +20,15 @@ namespace Aplicacion.Command.Usuarios
 
         public async Task<bool> Handle(ActualizarUsuarioCommand request, CancellationToken cancellationToken)
         {
-            var usuarios = await _repositorioGenerico.GetAsync(u => u.Guid.Equals(request.Usuario.Guid));
+            var usuarios = await _repositorioGenerico.GetAsync(u => u.Guid.Equals(request.Guid));
             if (usuarios == null)
-                return false;
+                throw new ApiException() { ExceptionMessage = "Usuario no existe", StatusCode = HttpStatusCode.BadRequest };
 
             var usuario = usuarios.FirstOrDefault();
 
-            if (usuario == null)
-                return false;
-
-            usuario.PerfilId = request.Usuario.PerfilId;
-            usuario.CentroVentaId = request.Usuario.CentroVentaId;
+            usuario.PerfilId = request.PerfilId;
+            usuario.CentroVentaId = request.CentroVentaId;
             await _repositorioGenerico.UpdateAsync(usuario);
-
             return true;
         }
     }

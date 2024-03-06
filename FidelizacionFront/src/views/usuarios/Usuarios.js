@@ -11,6 +11,7 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CForm,
   CFormInput,
   CModal,
   CModalBody,
@@ -28,10 +29,12 @@ import DeleteUsuario from 'src/services/usuarios/DeleteUsuario'
 import GetPerfiles from 'src/services/configuraciones/GetPerfiles'
 import GetCentroVentas from '../../services/centroVentas/GetCentroVentas'
 import GetCentroVentaPorCompania from '../../services/centroVentas/GetCentroVentaPorCompania'
+import Toast from '../notifications/toasts/Toasts'
 
 const AddUsuarioModal = (props) => {
   const perfil = localStorage.getItem('perfil')
   const centroVenta = localStorage.getItem('idCentroVenta')
+  const [validated, setValidated] = useState(false)
   const [addUsuarioVisible, setAddUsuarioVisible] = useState(false)
   const [centroVentaDisabled, setCentroVentaDisabled] = useState(true)
   const [inputCentroVentaVisible, setCentroVentaVisible] = useState(
@@ -55,12 +58,31 @@ const AddUsuarioModal = (props) => {
   const handleCentroVentaChange = (event) => {
     setNewCentroVentaChange(event.target.value)
   }
-  const addUsuario = async () => {
-    await AddUsuario(newNombreUsuario, newPerfil, newCentroVenta === '0' ? null : newCentroVenta)
-    props.GetUsuarios()
-    setNewPerfilChange(perfil)
-    setNewCentroVentaChange(centroVenta)
-    setAddUsuarioVisible(false)
+  const handleSubmit = async (event) => {
+    const form = event.currentTarget
+    if (form.checkValidity() === false) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    setValidated(true)
+    if (form.checkValidity() === true) {
+      let resultado = await AddUsuario(
+        newNombreUsuario,
+        newPerfil,
+        newCentroVenta === '0' ? null : newCentroVenta,
+      )
+      props.GetUsuarios()
+      setValidated(false)
+      if (resultado.status === 400 || resultado.status === 500) {
+        props.toast.current.showToast(resultado.response, 'danger')
+      }
+      if (resultado.status === 200) {
+        setNewPerfilChange(perfil)
+        setNewCentroVentaChange(centroVenta)
+        props.toast.current.showToast('Usuario agregado con exito', 'success')
+        setAddUsuarioVisible(false)
+      }
+    }
   }
 
   return (
@@ -77,53 +99,75 @@ const AddUsuarioModal = (props) => {
           <CModalTitle>Agregar Usuarios</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CRow className="mb-2">
-            <CCol xs={3}>Nombre de Usuario*:</CCol>
-            <CCol xs={9}>
-              <CFormInput placeholder="Nombre de usuario" onChange={handleNombreUsuarioChange} />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Perfil*:</CCol>
-            <CCol xs={9}>
-              <CFormSelect aria-label="Default select example" onChange={handlePerfilChange}>
-                <option>Selecione un opcion</option>
-                {props.Perfiles.map((perfil) => (
-                  <option key={perfil.id} value={perfil.id}>
-                    {perfil.nombre}
-                  </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-          </CRow>
-          {inputCentroVentaVisible && (
+          <CForm
+            className="row g-3 needs-validation"
+            noValidate
+            validated={validated}
+            onSubmit={handleSubmit}
+          >
             <CRow className="mb-2">
-              <CCol xs={3}>Centro de Venta*:</CCol>
+              <CCol xs={3}>Nombre de Usuario*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Nombre de usuario"
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleNombreUsuarioChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Perfil*:</CCol>
               <CCol xs={9}>
                 <CFormSelect
-                  aria-label="Default select example"
-                  onChange={handleCentroVentaChange}
-                  disabled={centroVentaDisabled}
+                  aria-label="Perfil"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handlePerfilChange}
+                  required
                 >
-                  <option>Selecione un opcion</option>
-                  {props.CentroVentas.map((centroVenta) => (
-                    <option key={centroVenta.id} value={centroVenta.id}>
-                      {centroVenta.nombre}
+                  <option selected="" value="">
+                    Seleccione una opci&oacute;n
+                  </option>
+                  {props.Perfiles.map((perfil) => (
+                    <option key={perfil.id} value={perfil.id}>
+                      {perfil.nombre}
                     </option>
                   ))}
                 </CFormSelect>
               </CCol>
             </CRow>
-          )}
+            {inputCentroVentaVisible && (
+              <CRow className="mb-2">
+                <CCol xs={3}>Centro de Venta*:</CCol>
+                <CCol xs={9}>
+                  <CFormSelect
+                    aria-label="Default select example"
+                    feedbackInvalid="Este campo es requerido"
+                    onChange={handleCentroVentaChange}
+                    disabled={centroVentaDisabled}
+                    required
+                  >
+                    <option>Selecione un opcion</option>
+                    {props.CentroVentas.map((centroVenta) => (
+                      <option key={centroVenta.id} value={centroVenta.id}>
+                        {centroVenta.nombre}
+                      </option>
+                    ))}
+                  </CFormSelect>
+                </CCol>
+              </CRow>
+            )}
+            <CModalFooter>
+              <CButton color="secondary" onClick={() => setAddUsuarioVisible(false)}>
+                Cerrar
+              </CButton>
+              <CButton color="primary" type="submit">
+                Agregar
+              </CButton>
+            </CModalFooter>
+          </CForm>
         </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setAddUsuarioVisible(false)}>
-            Cerrar
-          </CButton>
-          <CButton color="primary" onClick={addUsuario}>
-            Agregar
-          </CButton>
-        </CModalFooter>
       </CModal>
     </>
   )
@@ -132,6 +176,7 @@ const AddUsuarioModal = (props) => {
 const TaskUsuario = (props) => {
   const perfil = localStorage.getItem('perfil')
   const centroVenta = localStorage.getItem('idCentroVenta')
+  const [validated, setValidated] = useState(false)
   const [updateUsuarioVisible, setUpdateUsuarioVisible] = useState(false)
   const [deleteUsuarioVisible, setDeleteUsuarioVisible] = useState(false)
   const [centroVentaDisabled, setCentroVentaDisabled] = useState(props.Usuario.perfilId === 1)
@@ -156,22 +201,41 @@ const TaskUsuario = (props) => {
     setNewCentroVentaChange(event.target.value)
   }
 
-  const updateUsuario = async () => {
-    let usuario = props.Usuario
-    usuario.nombreUsuario = newNombreUsuario
-    usuario.perfilId = newPerfil
-    usuario.centroVentaId = newCentroVenta === '0' ? null : newCentroVenta
-    usuario.centroVenta = null
-    await UpdateUsuario(props.Usuario)
-    props.GetUsuarios()
-    setNewPerfilChange(perfil)
-    setNewCentroVentaChange(centroVenta)
-    setUpdateUsuarioVisible(false)
+  const handleSubmit = async (event) => {
+    const form = event.currentTarget
+    if (form.checkValidity() === false) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    setValidated(true)
+    if (form.checkValidity() === true) {
+      let usuario = props.Usuario
+      usuario.nombreUsuario = newNombreUsuario
+      usuario.perfilId = newPerfil
+      usuario.centroVentaId = newCentroVenta === '0' ? null : newCentroVenta
+      let resultado = await UpdateUsuario(props.Usuario)
+      props.GetUsuarios()
+      setValidated(false)
+      if (resultado.status === 400 || resultado.status === 500) {
+        props.toast.current.showToast(resultado.response, 'danger')
+      }
+      if (resultado.status === 200) {
+        props.toast.current.showToast('Usuario actualizado con exito', 'success')
+        setUpdateUsuarioVisible(false)
+      }
+    }
   }
+
   const deleteUsuario = async () => {
-    await DeleteUsuario(props.Usuario)
+    let resultado = await DeleteUsuario(props.Usuario)
+    if (resultado.status === 400 || resultado.status === 500) {
+      props.toast.current.showToast(resultado.response, 'danger')
+    }
     props.GetUsuarios()
     setDeleteUsuarioVisible(false)
+    if (resultado.status === 200) {
+      props.toast.current.showToast('Usuario eliminado con exito', 'success')
+    }
   }
 
   return (
@@ -188,62 +252,78 @@ const TaskUsuario = (props) => {
           <CModalTitle>Actualizar Usuario</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CRow className="mb-2">
-            <CCol xs={3}>Nombre de Usuario*:</CCol>
-            <CCol xs={9}>
-              <CFormInput
-                value={newNombreUsuario}
-                placeholder="Nombre de usuario"
-                onChange={handleNombreUsuarioChange}
-              />
-            </CCol>
-          </CRow>
-          <CRow className="mb-2">
-            <CCol xs={3}>Perfil*:</CCol>
-            <CCol xs={9}>
-              <CFormSelect
-                value={newPerfil}
-                aria-label="Default select example"
-                onChange={handlePerfilChange}
-              >
-                <option>Selecione un opcion</option>
-                {props.Perfiles.map((perfil) => (
-                  <option key={perfil.id} value={perfil.id}>
-                    {perfil.nombre}
-                  </option>
-                ))}
-              </CFormSelect>
-            </CCol>
-          </CRow>
-          {inputCentroVentaVisible && (
+          <CForm
+            className="row g-3 needs-validation"
+            noValidate
+            validated={validated}
+            onSubmit={handleSubmit}
+          >
             <CRow className="mb-2">
-              <CCol xs={3}>Centro de Venta*:</CCol>
+              <CCol xs={3}>Nombre de Usuario*:</CCol>
+              <CCol xs={9}>
+                <CFormInput
+                  placeholder="Nombre de usuario"
+                  value={newNombreUsuario}
+                  type="text"
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handleNombreUsuarioChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CRow className="mb-2">
+              <CCol xs={3}>Perfil*:</CCol>
               <CCol xs={9}>
                 <CFormSelect
-                  value={newCentroVenta}
-                  aria-label="Default select example"
-                  onChange={handleCentroVentaChange}
-                  disabled={centroVentaDisabled}
+                  aria-label="Perfil"
+                  value={newPerfil}
+                  feedbackInvalid="Este campo es requerido"
+                  onChange={handlePerfilChange}
+                  required
                 >
-                  <option>Selecione un opcion</option>
-                  {props.CentroVentas.map((centroVenta) => (
-                    <option key={centroVenta.id} value={centroVenta.id}>
-                      {centroVenta.nombre}
+                  <option selected="" value="">
+                    Seleccione una opci&oacute;n
+                  </option>
+                  {props.Perfiles.map((perfil) => (
+                    <option key={perfil.id} value={perfil.id}>
+                      {perfil.nombre}
                     </option>
                   ))}
                 </CFormSelect>
               </CCol>
             </CRow>
-          )}
+            {inputCentroVentaVisible && (
+              <CRow className="mb-2">
+                <CCol xs={3}>Centro de Venta*:</CCol>
+                <CCol xs={9}>
+                  <CFormSelect
+                    aria-label="Default select example"
+                    value={newCentroVenta}
+                    feedbackInvalid="Este campo es requerido"
+                    onChange={handleCentroVentaChange}
+                    disabled={centroVentaDisabled}
+                    required
+                  >
+                    <option>Selecione un opcion</option>
+                    {props.CentroVentas.map((centroVenta) => (
+                      <option key={centroVenta.id} value={centroVenta.id}>
+                        {centroVenta.nombre}
+                      </option>
+                    ))}
+                  </CFormSelect>
+                </CCol>
+              </CRow>
+            )}
+            <CModalFooter>
+              <CButton color="secondary" onClick={() => setUpdateUsuarioVisible(false)}>
+                Cerrar
+              </CButton>
+              <CButton color="primary" type="submit">
+                Actualizar
+              </CButton>
+            </CModalFooter>
+          </CForm>
         </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setUpdateUsuarioVisible(false)}>
-            Cerrar
-          </CButton>
-          <CButton color="primary" onClick={updateUsuario}>
-            Actualizar
-          </CButton>
-        </CModalFooter>
       </CModal>
       <CButton style={{ margin: '2pt' }} onClick={() => setDeleteUsuarioVisible(true)}>
         <CIcon icon={cilX} size="sm" />
@@ -283,47 +363,58 @@ const Usuarios = () => {
   const toastRef = useRef()
 
   const fetchUsuarios = async () => {
-    let usuarios = []
-    if (perfil === '1') {
-      usuarios = await GetUsuarios()
-    } else if (perfil === '2') {
-      usuarios = await GetUsuariosPorCompania()
-    } else {
-      usuarios = await GetUsuariosPorCentroVenta()
-    }
-    if (usuarios === 'fail') {
-      navigate('/Login', { replace: true })
-    }
-
     if (perfil !== '1' && perfil !== '2' && perfil !== '3') {
       navigate('/dashboard', { replace: true })
     }
-
-    setUsuarios(usuarios)
+    let resultado = []
+    if (perfil === '1') {
+      resultado = await GetUsuarios()
+    } else if (perfil === '2') {
+      resultado = await GetUsuariosPorCompania()
+    } else {
+      resultado = await GetUsuariosPorCentroVenta()
+    }
+    if (resultado.status === 401) {
+      navigate('/Login', { replace: true })
+    }
+    if (resultado.status === 400 || resultado.status === 500) {
+      toastRef.current.showToast(resultado.response, 'danger')
+    }
+    if (resultado.status === 200) {
+      setUsuarios(resultado.response)
+    }
   }
 
   const fetchPerfiles = async () => {
-    let perfiles = await GetPerfiles()
-    if (perfiles === 'fail') {
+    let perfilesResultado = await GetPerfiles()
+    if (perfilesResultado.status === 401) {
       navigate('/Login', { replace: true })
     }
-
-    perfiles = perfiles.filter((x) => x.id >= perfil)
-    setPerfiles(perfiles)
+    if (perfilesResultado.status === 400 || perfilesResultado.status === 500) {
+      toastRef.current.showToast(perfilesResultado.response, 'danger')
+    }
+    if (perfilesResultado.status === 200) {
+      perfilesResultado.response = perfilesResultado.response.filter((x) => x.id >= perfil)
+      setPerfiles(perfilesResultado.response)
+    }
   }
 
   const fetchCentroVentas = async () => {
-    let CentroVentas = []
+    let centroVentasResultado = []
     if (perfil === '1') {
-      CentroVentas = await GetCentroVentas()
+      centroVentasResultado = await GetCentroVentas()
     } else {
-      CentroVentas = await GetCentroVentaPorCompania()
+      centroVentasResultado = await GetCentroVentaPorCompania()
     }
-    if (CentroVentas === 'fail') {
+    if (centroVentasResultado.status === 401) {
       navigate('/Login', { replace: true })
     }
-
-    setCentroVentas(CentroVentas)
+    if (centroVentasResultado.status === 400 || centroVentasResultado.status === 500) {
+      toastRef.current.showToast(centroVentasResultado.response, 'danger')
+    }
+    if (centroVentasResultado.status === 200) {
+      setCentroVentas(centroVentasResultado.response)
+    }
   }
 
   useEffect(() => {
@@ -334,34 +425,38 @@ const Usuarios = () => {
 
   return (
     <>
+      <Toast ref={toastRef}></Toast>
       <h1>Usuarios</h1>
-      <AddUsuarioModal
-        GetUsuarios={fetchUsuarios}
-        Perfiles={Perfiles}
-        CentroVentas={CentroVentas}
-      />
       <CRow>
-        <CTable>
-          <CTableHead>
+        <CTable align="middle" bordered small hover>
+          <CTableHead align="middle">
             <CTableRow>
               <CTableHeaderCell scope="col">Nombre de Usuario</CTableHeaderCell>
               <CTableHeaderCell scope="col">Perfil</CTableHeaderCell>
               <CTableHeaderCell scope="col">Centro de Venta</CTableHeaderCell>
-              <CTableHeaderCell scope="col"></CTableHeaderCell>
+              <CTableHeaderCell scope="col">
+                <AddUsuarioModal
+                  GetUsuarios={fetchUsuarios}
+                  Perfiles={Perfiles}
+                  CentroVentas={CentroVentas}
+                  toast={toastRef}
+                />
+              </CTableHeaderCell>
             </CTableRow>
           </CTableHead>
-          <CTableBody>
+          <CTableBody align="middle">
             {Usuarios.map((usuario) => (
               <CTableRow key={usuario.Guid}>
                 <CTableHeaderCell>{usuario.nombreUsuario}</CTableHeaderCell>
-                <CTableHeaderCell>{usuario.perfilId}</CTableHeaderCell>
-                <CTableHeaderCell>{usuario.centroVenta?.nombre}</CTableHeaderCell>
+                <CTableHeaderCell>{usuario.perfil}</CTableHeaderCell>
+                <CTableHeaderCell>{usuario.nombreCentroVenta}</CTableHeaderCell>
                 <CTableHeaderCell>
                   <TaskUsuario
                     GetUsuarios={fetchUsuarios}
                     Usuario={usuario}
                     Perfiles={Perfiles}
                     CentroVentas={CentroVentas}
+                    toast={toastRef}
                   />
                 </CTableHeaderCell>
               </CTableRow>
